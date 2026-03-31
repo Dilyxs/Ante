@@ -12,6 +12,7 @@ declare_id!("FraezYKQ1zKbysJJK7jYGr8J2ZVt5Cyz3GrQ3WSDLQyS");
 pub mod challenge_protocol {
     use super::*;
     pub fn initialize(ctx: Context<InitializeProgram>) -> Result<()> {
+        ctx.accounts.config.admin = ctx.accounts.signer.key();
         Ok(())
     }
     pub fn requestAnteTokens(
@@ -38,18 +39,21 @@ pub mod challenge_protocol {
         };
         let cpi_req = CpiContext::new_with_signer(token_program, req, seeds);
         token_interface::mint_to(cpi_req, ante_token_count)?;
+
         Ok(())
     }
 }
 #[derive(Accounts)]
 pub struct GetAndeTokensFaucet<'info> {
-    ///CHECK: this is user asking for stuff
-    pub asker: UncheckedAccount<'info>,
+    pub admin: Signer<'info>,
     #[account(
         seeds=[b"Ante"],
         bump
     )]
     pub mint: InterfaceAccount<'info, Mint>,
+    #[account(mut)]
+    ///CHECK: get asker, they are safe since we are only transfering tokens to them
+    pub asker: UncheckedAccount<'info>,
     #[account(mut,
     associated_token::mint=mint,
     associated_token::authority=asker,
@@ -59,12 +63,19 @@ pub struct GetAndeTokensFaucet<'info> {
     seeds=[b"authority"],
     bump
     )]
+    ///CHECK: vault_authority is safe
     pub vault_authority: UncheckedAccount<'info>,
     #[account(mut,
     associated_token::mint=mint,
     associated_token::authority=vault_authority,
     )]
     pub vault_ata: InterfaceAccount<'info, TokenAccount>,
+    #[account(mut,
+    seeds=[b"config"],
+    bump,
+    has_one = admin
+    )]
+    pub config: Account<'info, Config>,
     pub token_program: Interface<'info, TokenInterface>,
     pub system_program: Program<'info, System>,
     pub associated_token_program: Program<'info, AssociatedToken>,
@@ -96,6 +107,13 @@ pub struct InitializeProgram<'info> {
         associated_token::authority=vault_authority,
     )]
     pub vault_ata: InterfaceAccount<'info, TokenAccount>,
+    #[account(init,
+        space=ANCHOR_DISCRIMINATOR+ Config::INIT_SPACE,
+        payer=signer,
+        seeds=[b"config"],
+        bump
+    )]
+    pub config: Account<'info, Config>,
     pub token_program: Interface<'info, TokenInterface>,
     pub system_program: Program<'info, System>,
     pub associated_token_program: Program<'info, AssociatedToken>,
@@ -142,4 +160,10 @@ pub struct PosterWinner {
 pub enum ChallengeProtocolError {
     #[msg("incorrect token request amount")]
     IncorrectTokenRequestAmount,
+}
+
+#[account]
+#[derive(InitSpace)]
+pub struct Config {
+    pub admin: Pubkey,
 }
