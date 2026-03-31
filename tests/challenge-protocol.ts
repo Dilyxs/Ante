@@ -5,14 +5,16 @@ import { assert } from "chai";
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
   TOKEN_PROGRAM_ID,
+  createAssociatedTokenAccountInstruction,
+  createTransferCheckedInstruction,
   getAccount,
   getAssociatedTokenAddressSync,
   getMint,
 } from "@solana/spl-token";
 
 describe("challenge-protocol", () => {
-  // Configure the client to use the local cluster.
-  anchor.setProvider(anchor.AnchorProvider.env());
+  const provider = anchor.AnchorProvider.env();
+  anchor.setProvider(provider);
 
   const program = anchor.workspace
     .challengeProtocol as Program<ChallengeProtocol>;
@@ -24,30 +26,46 @@ describe("challenge-protocol", () => {
   const ASSOCIATED_TOKEN_PROGRAM = ASSOCIATED_TOKEN_PROGRAM_ID;
   const VAULT_MINT_DECIMALS = 6;
 
-  it("initialize vault", async () => {
-    const provider = anchor.getProvider();
-    const wallet = provider.wallet.publicKey;
+  let vaultAuthorityPda: anchor.web3.PublicKey;
+  let anteMintPda: anchor.web3.PublicKey;
+  let configPda: anchor.web3.PublicKey;
+  let vaultAta: anchor.web3.PublicKey;
+  let ownerAta: anchor.web3.PublicKey;
 
-    const [vaultAuthorityPda] = anchor.web3.PublicKey.findProgramAddressSync(
+  before(async () => {
+    const wallet = provider.wallet.publicKey;
+    [vaultAuthorityPda] = anchor.web3.PublicKey.findProgramAddressSync(
       [VAULT_AUTHORITY_SEED],
       program.programId
     );
-    const [anteMintPda] = anchor.web3.PublicKey.findProgramAddressSync(
+    [anteMintPda] = anchor.web3.PublicKey.findProgramAddressSync(
       [ANTE_MINT_SEED],
       program.programId
     );
-    const [configPda] = anchor.web3.PublicKey.findProgramAddressSync(
+    [configPda] = anchor.web3.PublicKey.findProgramAddressSync(
       [CONFIG_SEED],
       program.programId
     );
 
-    const vaultAta = getAssociatedTokenAddressSync(
+    vaultAta = getAssociatedTokenAddressSync(
       anteMintPda,
       vaultAuthorityPda,
       true,
       TOKEN_PROGRAM,
       ASSOCIATED_TOKEN_PROGRAM
     );
+
+    ownerAta = getAssociatedTokenAddressSync(
+      anteMintPda,
+      wallet,
+      true,
+      TOKEN_PROGRAM,
+      ASSOCIATED_TOKEN_PROGRAM
+    );
+  });
+
+  it("initialize vault", async () => {
+    const wallet = provider.wallet.publicKey;
 
     await program.methods
       .initialize()
@@ -60,7 +78,7 @@ describe("challenge-protocol", () => {
         tokenProgram: TOKEN_PROGRAM,
         associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM,
         systemProgram: anchor.web3.SystemProgram.programId,
-      })
+      } as any)
       .rpc();
 
     const configAccount = await program.account.config.fetch(configPda);
@@ -74,5 +92,128 @@ describe("challenge-protocol", () => {
     assert.equal(vaultAtaAccount.amount, BigInt(0));
     assert.ok(vaultAtaAccount.owner.equals(vaultAuthorityPda));
     assert.ok(vaultAtaAccount.mint.equals(anteMintPda));
+  });
+
+  it("fails: stranger cannot mint ante tokens", async () => {
+    const wallet = provider.wallet.publicKey;
+    const stranger = anchor.web3.Keypair.generate();
+    const strangerAta = getAssociatedTokenAddressSync(
+      anteMintPda,
+      stranger.publicKey,
+      true,
+      TOKEN_PROGRAM,
+      ASSOCIATED_TOKEN_PROGRAM
+    );
+
+    const createStrangerAtaTx = new anchor.web3.Transaction().add(
+      createAssociatedTokenAccountInstruction(
+        wallet,
+        strangerAta,
+        stranger.publicKey,
+        anteMintPda,
+        TOKEN_PROGRAM,
+        ASSOCIATED_TOKEN_PROGRAM
+      )
+    );
+    await provider.sendAndConfirm(createStrangerAtaTx);
+
+    let failed = false;
+    try {
+      await program.methods
+        .requestAnteTokens(new anchor.BN(1))
+        .accounts({
+          admin: stranger.publicKey,
+          mint: anteMintPda,
+          asker: stranger.publicKey,
+          askerAta: strangerAta,
+          vaultAuthority: vaultAuthorityPda,
+          vaultAta,
+          config: configPda,
+          tokenProgram: TOKEN_PROGRAM,
+          associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM,
+          systemProgram: anchor.web3.SystemProgram.programId,
+        } as any)
+        .signers([stranger])
+        .rpc();
+      assert.fail("expected stranger mint request to fail");
+    } catch (err) {
+      failed = true;
+      assert.isOk(err);
+    }
+
+    assert.isTrue(failed, "stranger mint request should fail");
+  });
+
+  it("passes: owner mints ante tokens and transfers", async () => {
+    const wallet = provider.wallet.publicKey;
+    const ownerAtaAccount = await provider.connection.getAccountInfo(ownerAta);
+    if (!ownerAtaAccount) {
+      const createOwnerAtaTx = new anchor.web3.Transaction().add(
+        createAssociatedTokenAccountInstruction(
+          wallet,
+          ownerAta,
+          wallet,
+          anteMintPda,
+          TOKEN_PROGRAM,
+          ASSOCIATED_TOKEN_PROGRAM
+        )
+      );
+      await provider.sendAndConfirm(createOwnerAtaTx);
+    }
+
+    const stranger = anchor.web3.Keypair.generate();
+    const strangerAta = getAssociatedTokenAddressSync(
+      anteMintPda,
+      stranger.publicKey,
+      true,
+      TOKEN_PROGRAM,
+      ASSOCIATED_TOKEN_PROGRAM
+    );
+
+    const createStrangerAtaTx = new anchor.web3.Transaction().add(
+      createAssociatedTokenAccountInstruction(
+        wallet,
+        strangerAta,
+        stranger.publicKey,
+        anteMintPda,
+        TOKEN_PROGRAM,
+        ASSOCIATED_TOKEN_PROGRAM
+      )
+    );
+    await provider.sendAndConfirm(createStrangerAtaTx);
+
+    await program.methods
+      .requestAnteTokens(new anchor.BN(4))
+      .accounts({
+        admin: wallet,
+        mint: anteMintPda,
+        asker: wallet,
+        askerAta: ownerAta,
+        vaultAuthority: vaultAuthorityPda,
+        vaultAta,
+        config: configPda,
+        tokenProgram: TOKEN_PROGRAM,
+        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM,
+        systemProgram: anchor.web3.SystemProgram.programId,
+      } as any)
+      .rpc();
+
+    const transferTx = new anchor.web3.Transaction().add(
+      createTransferCheckedInstruction(
+        ownerAta,
+        anteMintPda,
+        strangerAta,
+        wallet,
+        BigInt(2),
+        VAULT_MINT_DECIMALS
+      )
+    );
+    await provider.sendAndConfirm(transferTx);
+
+    const strangerAccount = await getAccount(provider.connection, strangerAta);
+    assert.equal(strangerAccount.amount, BigInt(2));
+
+    const ownerAccount = await getAccount(provider.connection, ownerAta);
+    assert.equal(ownerAccount.amount, BigInt(2));
   });
 });
