@@ -21,6 +21,7 @@ describe("challenge-protocol", () => {
   const VAULT_AUTHORITY_SEED = Buffer.from("authority");
   const ANTE_MINT_SEED = Buffer.from("Ante");
   const CONFIG_SEED = Buffer.from("config");
+  const USER_BALANCE_INFO_SEED = Buffer.from("user_balance_info");
   const TOKEN_PROGRAM = TOKEN_PROGRAM_ID;
   const ASSOCIATED_TOKEN_PROGRAM = ASSOCIATED_TOKEN_PROGRAM_ID;
   const VAULT_MINT_DECIMALS = 6;
@@ -28,6 +29,7 @@ describe("challenge-protocol", () => {
   let vaultAuthorityPda: anchor.web3.PublicKey;
   let anteMintPda: anchor.web3.PublicKey;
   let configPda: anchor.web3.PublicKey;
+  let userBalancePda: anchor.web3.PublicKey;
   let vaultAta: anchor.web3.PublicKey;
   let ownerAta: anchor.web3.PublicKey;
 
@@ -43,6 +45,10 @@ describe("challenge-protocol", () => {
     );
     [configPda] = anchor.web3.PublicKey.findProgramAddressSync(
       [CONFIG_SEED],
+      program.programId
+    );
+    [userBalancePda] = anchor.web3.PublicKey.findProgramAddressSync(
+      [USER_BALANCE_INFO_SEED, wallet.toBuffer()],
       program.programId
     );
 
@@ -205,5 +211,144 @@ describe("challenge-protocol", () => {
 
     const ownerAccount = await getAccount(provider.connection, ownerAta);
     assert.equal(ownerAccount.amount, ownerBefore.amount);
+  });
+
+  it("happy path: deposit then withdraw ante tokens", async () => {
+    const wallet = provider.wallet.publicKey;
+
+    const ownerAtaAccount = await provider.connection.getAccountInfo(ownerAta);
+    if (!ownerAtaAccount) {
+      const createOwnerAtaTx = new anchor.web3.Transaction().add(
+        createAssociatedTokenAccountInstruction(
+          wallet,
+          ownerAta,
+          wallet,
+          anteMintPda,
+          TOKEN_PROGRAM,
+          ASSOCIATED_TOKEN_PROGRAM
+        )
+      );
+      await provider.sendAndConfirm(createOwnerAtaTx);
+    }
+
+    await program.methods
+      .requestAnteTokens(new anchor.BN(8))
+      .accounts({
+        admin: wallet,
+        mint: anteMintPda,
+        asker: wallet,
+        askerAta: ownerAta,
+        vaultAuthority: vaultAuthorityPda,
+        vaultAta,
+        config: configPda,
+        tokenProgram: TOKEN_PROGRAM,
+        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM,
+        systemProgram: anchor.web3.SystemProgram.programId,
+      } as any)
+      .rpc();
+
+    const depositAmount = new anchor.BN(5);
+    const withdrawAmount = new anchor.BN(2);
+
+    const ownerBeforeDeposit = await getAccount(provider.connection, ownerAta);
+    const vaultBeforeDeposit = await getAccount(provider.connection, vaultAta);
+
+    await (program as any).methods
+      .depositeAnteTokens(depositAmount)
+      .accounts({
+        owner: wallet,
+        ownerAta,
+        mint: anteMintPda,
+        vaultAuthority: vaultAuthorityPda,
+        vaultAta,
+        userBalanceInfo: userBalancePda,
+        tokenProgram: TOKEN_PROGRAM,
+        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM,
+        systemProgram: anchor.web3.SystemProgram.programId,
+      })
+      .rpc();
+
+    const ownerAfterDeposit = await getAccount(provider.connection, ownerAta);
+    const vaultAfterDeposit = await getAccount(provider.connection, vaultAta);
+    assert.equal(
+      ownerAfterDeposit.amount,
+      ownerBeforeDeposit.amount - BigInt(5)
+    );
+    assert.equal(
+      vaultAfterDeposit.amount,
+      vaultBeforeDeposit.amount + BigInt(5)
+    );
+
+    let userBalance = await (program.account as any).userBalance.fetch(
+      userBalancePda
+    );
+    assert.equal(userBalance.balance.toString(), "5");
+
+    const ownerBeforeWithdraw = await getAccount(provider.connection, ownerAta);
+    const vaultBeforeWithdraw = await getAccount(provider.connection, vaultAta);
+
+    await (program as any).methods
+      .withdrawAnteTokens(withdrawAmount)
+      .accounts({
+        owner: wallet,
+        ownerAta,
+        mint: anteMintPda,
+        vaultAuthority: vaultAuthorityPda,
+        vaultAta,
+        userBalanceInfo: userBalancePda,
+        tokenProgram: TOKEN_PROGRAM,
+        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM,
+        systemProgram: anchor.web3.SystemProgram.programId,
+      })
+      .rpc();
+
+    const ownerAfterWithdraw = await getAccount(provider.connection, ownerAta);
+    const vaultAfterWithdraw = await getAccount(provider.connection, vaultAta);
+    assert.equal(
+      ownerAfterWithdraw.amount,
+      ownerBeforeWithdraw.amount + BigInt(2)
+    );
+    assert.equal(
+      vaultAfterWithdraw.amount,
+      vaultBeforeWithdraw.amount - BigInt(2)
+    );
+
+    userBalance = await (program.account as any).userBalance.fetch(
+      userBalancePda
+    );
+    assert.equal(userBalance.balance.toString(), "3");
+  });
+
+  it("sad path: fails when withdrawing more than balance", async () => {
+    const wallet = provider.wallet.publicKey;
+    const current_token_balance = await getAccount(
+      provider.connection,
+      ownerAta
+    );
+
+    let failed = false;
+    try {
+      await (program as any).methods
+        .withdrawAnteTokens(new anchor.BN(8))
+        .accounts({
+          owner: wallet,
+          ownerAta,
+          mint: anteMintPda,
+          vaultAuthority: vaultAuthorityPda,
+          vaultAta,
+          userBalanceInfo: userBalancePda,
+          tokenProgram: TOKEN_PROGRAM,
+          associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM,
+          systemProgram: anchor.web3.SystemProgram.programId,
+        })
+        .rpc();
+      assert.fail("expected withdraw above balance to fail");
+    } catch (err: any) {
+      failed = true;
+      assert.isOk(err);
+      assert.include(err.toString(), "InsufficientAnteTokens");
+    }
+
+    assert.isTrue(failed, "withdraw above balance should fail");
   });
 });

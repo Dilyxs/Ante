@@ -94,7 +94,6 @@ pub mod challenge_protocol {
         potential_answer: Option<[u8; 33]>,
         bounty_minimum_gain: u64,
     ) -> Result<()> {
-        //checker whether user has enough ante tokens to post a poster
         ctx.accounts.data.bounty_id = ctx.accounts.vault_global_state.bounty_counter;
         ctx.accounts.vault_global_state.bounty_counter += 1;
         ctx.accounts.data.bounty_type = bounty_type.clone();
@@ -336,7 +335,7 @@ pub struct PosterWinner {
 pub enum ChallengeProtocolError {
     #[msg("incorrect token request amount")]
     IncorrectTokenRequestAmount,
-    #[msg("poster deadline has passed")]
+    #[msg("insufficient ante tokens in vault")]
     InsufficientAnteTokens,
 }
 
