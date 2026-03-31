@@ -6,7 +6,6 @@ import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
   TOKEN_PROGRAM_ID,
   createAssociatedTokenAccountInstruction,
-  createTransferCheckedInstruction,
   getAccount,
   getAssociatedTokenAddressSync,
   getMint,
@@ -144,7 +143,7 @@ describe("challenge-protocol", () => {
     assert.isTrue(failed, "stranger mint request should fail");
   });
 
-  it("passes: owner mints ante tokens and transfers", async () => {
+  it("passes: owner distributes ante tokens directly to stranger", async () => {
     const wallet = provider.wallet.publicKey;
     const ownerAtaAccount = await provider.connection.getAccountInfo(ownerAta);
     if (!ownerAtaAccount) {
@@ -182,13 +181,16 @@ describe("challenge-protocol", () => {
     );
     await provider.sendAndConfirm(createStrangerAtaTx);
 
+    const ownerBefore = await getAccount(provider.connection, ownerAta);
+    const strangerBefore = await getAccount(provider.connection, strangerAta);
+
     await program.methods
       .requestAnteTokens(new anchor.BN(4))
       .accounts({
         admin: wallet,
         mint: anteMintPda,
-        asker: wallet,
-        askerAta: ownerAta,
+        asker: stranger.publicKey,
+        askerAta: strangerAta,
         vaultAuthority: vaultAuthorityPda,
         vaultAta,
         config: configPda,
@@ -198,22 +200,10 @@ describe("challenge-protocol", () => {
       } as any)
       .rpc();
 
-    const transferTx = new anchor.web3.Transaction().add(
-      createTransferCheckedInstruction(
-        ownerAta,
-        anteMintPda,
-        strangerAta,
-        wallet,
-        BigInt(2),
-        VAULT_MINT_DECIMALS
-      )
-    );
-    await provider.sendAndConfirm(transferTx);
-
     const strangerAccount = await getAccount(provider.connection, strangerAta);
-    assert.equal(strangerAccount.amount, BigInt(2));
+    assert.equal(strangerAccount.amount, strangerBefore.amount + BigInt(4));
 
     const ownerAccount = await getAccount(provider.connection, ownerAta);
-    assert.equal(ownerAccount.amount, BigInt(2));
+    assert.equal(ownerAccount.amount, ownerBefore.amount);
   });
 });

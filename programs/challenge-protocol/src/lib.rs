@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 use anchor_spl::associated_token::AssociatedToken;
-use anchor_spl::token_2022::{MintTo, TransferChecked};
+use anchor_spl::token_2022::MintTo;
 use anchor_spl::token_interface;
 use anchor_spl::token_interface::{Mint, TokenAccount, TokenInterface};
 const ANCHOR_DISCRIMINATOR: usize = 8;
@@ -46,7 +46,7 @@ pub mod challenge_protocol {
 #[derive(Accounts)]
 pub struct GetAndeTokensFaucet<'info> {
     pub admin: Signer<'info>,
-    #[account(
+    #[account(mut,
         seeds=[b"Ante"],
         bump
     )]
