@@ -63,7 +63,7 @@ pub mod challenge_protocol {
             ante_token_count,
             TOKEN_DEMICAL,
         )?;
-        ctx.accounts.user_balance_info.balance = ante_token_count;
+        ctx.accounts.user_balance_info.balance += ante_token_count;
         Ok(())
     }
     pub fn withdraw_ante_tokens(
