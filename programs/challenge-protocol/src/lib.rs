@@ -50,19 +50,14 @@ pub mod challenge_protocol {
         let mint = ctx.accounts.mint.to_account_info();
         let token_program = ctx.accounts.token_program.to_account_info();
 
-        let transfer_accounts = anchor_spl::token_2022::TransferChecked {
+        let transfer_accounts = token_interface::TransferChecked {
             from: user_ata,
             to: vault_ata,
             authority,
             mint,
         };
-        let seeds: &[&[&[u8]]] = &[&[b"authority", &[ctx.bumps.vault_authority]]];
-        let cpi_transfer_ctx = CpiContext::new_with_signer(token_program, transfer_accounts, seeds);
-        anchor_spl::token_2022::transfer_checked(
-            cpi_transfer_ctx,
-            ante_token_count,
-            TOKEN_DEMICAL,
-        )?;
+        let cpi_transfer_ctx = CpiContext::new(token_program, transfer_accounts);
+        token_interface::transfer_checked(cpi_transfer_ctx, ante_token_count, TOKEN_DEMICAL)?;
         ctx.accounts.user_balance_info.balance += ante_token_count;
         Ok(())
     }
@@ -75,11 +70,11 @@ pub mod challenge_protocol {
         }
         let user_ata = ctx.accounts.owner_ata.to_account_info();
         let vault_ata = ctx.accounts.vault_ata.to_account_info();
-        let authority = ctx.accounts.owner.to_account_info();
+        let authority = ctx.accounts.vault_authority.to_account_info();
         let mint = ctx.accounts.mint.to_account_info();
         let token_program = ctx.accounts.token_program.to_account_info();
 
-        let transfer_accounts = anchor_spl::token_2022::TransferChecked {
+        let transfer_accounts = token_interface::TransferChecked {
             from: vault_ata,
             to: user_ata,
             authority,
@@ -87,11 +82,7 @@ pub mod challenge_protocol {
         };
         let seeds: &[&[&[u8]]] = &[&[b"authority", &[ctx.bumps.vault_authority]]];
         let cpi_transfer_ctx = CpiContext::new_with_signer(token_program, transfer_accounts, seeds);
-        anchor_spl::token_2022::transfer_checked(
-            cpi_transfer_ctx,
-            ante_token_count,
-            TOKEN_DEMICAL,
-        )?;
+        token_interface::transfer_checked(cpi_transfer_ctx, ante_token_count, TOKEN_DEMICAL)?;
         ctx.accounts.user_balance_info.balance -= ante_token_count;
         Ok(())
     }
