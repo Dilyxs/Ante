@@ -85,7 +85,8 @@ pub mod challenge_protocol {
             authority,
             mint,
         };
-        let cpi_transfer_ctx = CpiContext::new(token_program, transfer_accounts);
+        let seeds: &[&[&[u8]]] = &[&[b"authority", &[ctx.bumps.vault_authority]]];
+        let cpi_transfer_ctx = CpiContext::new_with_signer(token_program, transfer_accounts, seeds);
         anchor_spl::token_2022::transfer_checked(
             cpi_transfer_ctx,
             ante_token_count,
