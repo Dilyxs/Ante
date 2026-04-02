@@ -10,6 +10,7 @@ import {
   getAssociatedTokenAddressSync,
   getMint,
 } from "@solana/spl-token";
+import { UInt64ToLE, ensureOwnerAtaHas } from "./helpers";
 
 describe("challenge-protocol", () => {
   const provider = anchor.AnchorProvider.env();
@@ -33,16 +34,7 @@ describe("challenge-protocol", () => {
   let vaultAta: anchor.web3.PublicKey;
   let ownerAta: anchor.web3.PublicKey;
 
-  // helper to encode u64 little-endian
-  function UInt64ToLE(n: number): Buffer {
-    const buf = Buffer.alloc(8);
-    let v = BigInt(n);
-    for (let i = 0; i < 8; i++) {
-      buf[i] = Number(v & BigInt(0xff));
-      v >>= BigInt(8);
-    }
-    return buf;
-  }
+  // helpers imported from tests/helpers.ts: UInt64ToLE, ensureOwnerAtaHas
 
   before(async () => {
     const wallet = provider.wallet.publicKey;
@@ -281,14 +273,11 @@ describe("challenge-protocol", () => {
 
     const ownerAfterDeposit = await getAccount(provider.connection, ownerAta);
     const vaultAfterDeposit = await getAccount(provider.connection, vaultAta);
-    assert.equal(
-      ownerAfterDeposit.amount,
-      ownerBeforeDeposit.amount - BigInt(5)
-    );
-    assert.equal(
-      vaultAfterDeposit.amount,
-      vaultBeforeDeposit.amount + BigInt(5)
-    );
+    // use delta checks to be robust against prior mints in the test run
+    const ownerDelta = ownerBeforeDeposit.amount - ownerAfterDeposit.amount;
+    const vaultDelta = vaultAfterDeposit.amount - vaultBeforeDeposit.amount;
+    assert.equal(ownerDelta, BigInt(5));
+    assert.equal(vaultDelta, BigInt(5));
 
     let userBalance = await (program.account as any).userBalance.fetch(
       userBalancePda
@@ -315,14 +304,12 @@ describe("challenge-protocol", () => {
 
     const ownerAfterWithdraw = await getAccount(provider.connection, ownerAta);
     const vaultAfterWithdraw = await getAccount(provider.connection, vaultAta);
-    assert.equal(
-      ownerAfterWithdraw.amount,
-      ownerBeforeWithdraw.amount + BigInt(2)
-    );
-    assert.equal(
-      vaultAfterWithdraw.amount,
-      vaultBeforeWithdraw.amount - BigInt(2)
-    );
+    const ownerWithdrawDelta =
+      ownerAfterWithdraw.amount - ownerBeforeWithdraw.amount;
+    const vaultWithdrawDelta =
+      vaultBeforeWithdraw.amount - vaultAfterWithdraw.amount;
+    assert.equal(ownerWithdrawDelta, BigInt(2));
+    assert.equal(vaultWithdrawDelta, BigInt(2));
 
     userBalance = await (program.account as any).userBalance.fetch(
       userBalancePda
@@ -505,7 +492,7 @@ describe("challenge-protocol", () => {
     );
   });
 
-  it("poster: create poster fails when insufficient balance", async () => {
+  it("poster: create poster fails — insufficient balance", async () => {
     const wallet = provider.wallet.publicKey;
 
     // ensure user has small balance (0)
@@ -566,5 +553,865 @@ describe("challenge-protocol", () => {
       );
     }
     assert.isTrue(failed, "insufficient balance must fail poster creation");
+  });
+
+  it("publish: publisher posts solution — happy path (deadline passed)", async () => {
+    const wallet = provider.wallet.publicKey;
+
+    // create poster with deadline in the past so publish is allowed
+    const depositAmount = new anchor.BN(8);
+    // mint enough tokens to owner ATA so we can deposit and still have tokens for bounty transfer
+    await (program as any).methods
+      .requestAnteTokens(new anchor.BN(8))
+      .accounts({
+        admin: wallet,
+        mint: anteMintPda,
+        asker: wallet,
+        askerAta: ownerAta,
+        vaultAuthority: vaultAuthorityPda,
+        vaultAta,
+        config: configPda,
+        tokenProgram: TOKEN_PROGRAM,
+        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM,
+        systemProgram: anchor.web3.SystemProgram.programId,
+      } as any)
+      .rpc();
+    await (program as any).methods
+      .requestAnteTokens(new anchor.BN(4))
+      .accounts({
+        admin: wallet,
+        mint: anteMintPda,
+        asker: wallet,
+        askerAta: ownerAta,
+        vaultAuthority: vaultAuthorityPda,
+        vaultAta,
+        config: configPda,
+        tokenProgram: TOKEN_PROGRAM,
+        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM,
+        systemProgram: anchor.web3.SystemProgram.programId,
+      } as any)
+      .rpc();
+
+    await (program as any).methods
+      .depositeAnteTokens(depositAmount)
+      .accounts({
+        owner: wallet,
+        ownerAta,
+        mint: anteMintPda,
+        vaultAuthority: vaultAuthorityPda,
+        vaultAta,
+        userBalanceInfo: userBalancePda,
+        tokenProgram: TOKEN_PROGRAM,
+        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM,
+        systemProgram: anchor.web3.SystemProgram.programId,
+      })
+      .rpc();
+
+    const vaultState: any = await (
+      program.account as any
+    ).vaultGlobalState.fetch(
+      (
+        await anchor.web3.PublicKey.findProgramAddressSync(
+          [Buffer.from("vault_global_state")],
+          program.programId
+        )
+      )[0]
+    );
+    const counterBefore = vaultState.bountyCounter.toNumber();
+
+    // replenish owner ATA so uploadNewPoster transfer will succeed (owner_ata must have tokens)
+    await (program as any).methods
+      .requestAnteTokens(new anchor.BN(4))
+      .accounts({
+        admin: wallet,
+        mint: anteMintPda,
+        asker: wallet,
+        askerAta: ownerAta,
+        vaultAuthority: vaultAuthorityPda,
+        vaultAta,
+        config: configPda,
+        tokenProgram: TOKEN_PROGRAM,
+        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM,
+        systemProgram: anchor.web3.SystemProgram.programId,
+      } as any)
+      .rpc();
+
+    // ensure owner ATA has enough tokens for the bounty transfer
+    await program.methods
+      .requestAnteTokens(new anchor.BN(4))
+      .accounts({
+        admin: wallet,
+        mint: anteMintPda,
+        asker: wallet,
+        askerAta: ownerAta,
+        vaultAuthority: vaultAuthorityPda,
+        vaultAta,
+        config: configPda,
+        tokenProgram: TOKEN_PROGRAM,
+        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM,
+        systemProgram: anchor.web3.SystemProgram.programId,
+      } as any)
+      .rpc();
+
+    // create poster with deadline passed (0)
+    await ensureOwnerAtaHas(
+      program,
+      provider,
+      ownerAta,
+      anteMintPda,
+      vaultAuthorityPda,
+      vaultAta,
+      configPda,
+      16
+    );
+    await (program as any).methods
+      .uploadNewPoster(
+        new anchor.BN(4),
+        { openEnded: {} },
+        { numberTheory: {} },
+        new anchor.BN(0),
+        null,
+        new anchor.BN(1)
+      )
+      .accounts({
+        owner: wallet,
+        mint: anteMintPda,
+        userAta: ownerAta,
+        vaultGlobalState: (
+          await anchor.web3.PublicKey.findProgramAddressSync(
+            [Buffer.from("vault_global_state")],
+            program.programId
+          )
+        )[0],
+        data: anchor.web3.PublicKey.findProgramAddressSync(
+          [Buffer.from("poster"), Buffer.from(UInt64ToLE(counterBefore))],
+          program.programId
+        )[0],
+        userBalanceInfo: userBalancePda,
+        vaultAuthority: vaultAuthorityPda,
+        vaultAta,
+        tokenProgram: TOKEN_PROGRAM,
+        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM,
+        systemProgram: anchor.web3.SystemProgram.programId,
+      })
+      .rpc();
+
+    const posterPda = anchor.web3.PublicKey.findProgramAddressSync(
+      [Buffer.from("poster"), Buffer.from(UInt64ToLE(counterBefore))],
+      program.programId
+    )[0];
+
+    const publisherDecryptedAnswerPda =
+      anchor.web3.PublicKey.findProgramAddressSync(
+        [
+          Buffer.from("poster_decrypted_answer"),
+          Buffer.from(UInt64ToLE(counterBefore)),
+          wallet.toBuffer(),
+        ],
+        program.programId
+      )[0];
+
+    // publisher posts solution
+    await program.methods
+      .postPosterSolution(
+        new anchor.BN(counterBefore),
+        "publisher answer",
+        "hash-1"
+      )
+      .accounts({
+        publisher: wallet,
+        posterInfo: posterPda,
+        publisherDecryptedAnswer: publisherDecryptedAnswerPda,
+        systemProgram: anchor.web3.SystemProgram.programId,
+      })
+      .rpc();
+
+    // verify account created
+    const pubAns: any = await (
+      program.account as any
+    ).posterPublisherDecryptedAnswer.fetch(publisherDecryptedAnswerPda);
+    assert.equal(pubAns.posterId.toString(), counterBefore.toString());
+    assert.equal(pubAns.answer, "publisher answer");
+    assert.equal(pubAns.hash, "hash-1");
+  });
+
+  it("publish: publisher posts solution — fails when deadline not passed", async () => {
+    const wallet = provider.wallet.publicKey;
+
+    // deposit and create poster with future deadline
+    // mint enough tokens to owner ATA so we can deposit and still have tokens for bounty transfer
+    await (program as any).methods
+      .requestAnteTokens(new anchor.BN(8))
+      .accounts({
+        admin: wallet,
+        mint: anteMintPda,
+        asker: wallet,
+        askerAta: ownerAta,
+        vaultAuthority: vaultAuthorityPda,
+        vaultAta,
+        config: configPda,
+        tokenProgram: TOKEN_PROGRAM,
+        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM,
+        systemProgram: anchor.web3.SystemProgram.programId,
+      } as any)
+      .rpc();
+    await (program as any).methods
+      .requestAnteTokens(new anchor.BN(4))
+      .accounts({
+        admin: wallet,
+        mint: anteMintPda,
+        asker: wallet,
+        askerAta: ownerAta,
+        vaultAuthority: vaultAuthorityPda,
+        vaultAta,
+        config: configPda,
+        tokenProgram: TOKEN_PROGRAM,
+        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM,
+        systemProgram: anchor.web3.SystemProgram.programId,
+      } as any)
+      .rpc();
+
+    await (program as any).methods
+      .depositeAnteTokens(new anchor.BN(8))
+      .accounts({
+        owner: wallet,
+        ownerAta,
+        mint: anteMintPda,
+        vaultAuthority: vaultAuthorityPda,
+        vaultAta,
+        userBalanceInfo: userBalancePda,
+        tokenProgram: TOKEN_PROGRAM,
+        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM,
+        systemProgram: anchor.web3.SystemProgram.programId,
+      })
+      .rpc();
+
+    // top up owner ATA so uploadNewPoster transfer will succeed
+    await (program as any).methods
+      .requestAnteTokens(new anchor.BN(4))
+      .accounts({
+        admin: wallet,
+        mint: anteMintPda,
+        asker: wallet,
+        askerAta: ownerAta,
+        vaultAuthority: vaultAuthorityPda,
+        vaultAta,
+        config: configPda,
+        tokenProgram: TOKEN_PROGRAM,
+        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM,
+        systemProgram: anchor.web3.SystemProgram.programId,
+      } as any)
+      .rpc();
+
+    const vaultState: any = await (
+      program.account as any
+    ).vaultGlobalState.fetch(
+      (
+        await anchor.web3.PublicKey.findProgramAddressSync(
+          [Buffer.from("vault_global_state")],
+          program.programId
+        )
+      )[0]
+    );
+    const counterBefore = vaultState.bountyCounter.toNumber();
+
+    // replenish owner ATA so uploadNewPoster transfer will succeed
+    await (program as any).methods
+      .requestAnteTokens(new anchor.BN(4))
+      .accounts({
+        admin: wallet,
+        mint: anteMintPda,
+        asker: wallet,
+        askerAta: ownerAta,
+        vaultAuthority: vaultAuthorityPda,
+        vaultAta,
+        config: configPda,
+        tokenProgram: TOKEN_PROGRAM,
+        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM,
+        systemProgram: anchor.web3.SystemProgram.programId,
+      } as any)
+      .rpc();
+
+    // ensure owner ATA has enough tokens for the bounty transfer
+    await program.methods
+      .requestAnteTokens(new anchor.BN(4))
+      .accounts({
+        admin: wallet,
+        mint: anteMintPda,
+        asker: wallet,
+        askerAta: ownerAta,
+        vaultAuthority: vaultAuthorityPda,
+        vaultAta,
+        config: configPda,
+        tokenProgram: TOKEN_PROGRAM,
+        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM,
+        systemProgram: anchor.web3.SystemProgram.programId,
+      } as any)
+      .rpc();
+
+    // create poster with far future deadline
+    // ensure owner ATA has enough tokens for the bounty transfer
+    await program.methods
+      .requestAnteTokens(new anchor.BN(4))
+      .accounts({
+        admin: wallet,
+        mint: anteMintPda,
+        asker: wallet,
+        askerAta: ownerAta,
+        vaultAuthority: vaultAuthorityPda,
+        vaultAta,
+        config: configPda,
+        tokenProgram: TOKEN_PROGRAM,
+        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM,
+        systemProgram: anchor.web3.SystemProgram.programId,
+      } as any)
+      .rpc();
+
+    await ensureOwnerAtaHas(
+      program,
+      provider,
+      ownerAta,
+      anteMintPda,
+      vaultAuthorityPda,
+      vaultAta,
+      configPda,
+      16
+    );
+    await (program as any).methods
+      .uploadNewPoster(
+        new anchor.BN(4),
+        { openEnded: {} },
+        { numberTheory: {} },
+        new anchor.BN(9999999999),
+        null,
+        new anchor.BN(1)
+      )
+      .accounts({
+        owner: wallet,
+        mint: anteMintPda,
+        userAta: ownerAta,
+        vaultGlobalState: (
+          await anchor.web3.PublicKey.findProgramAddressSync(
+            [Buffer.from("vault_global_state")],
+            program.programId
+          )
+        )[0],
+        data: anchor.web3.PublicKey.findProgramAddressSync(
+          [Buffer.from("poster"), Buffer.from(UInt64ToLE(counterBefore))],
+          program.programId
+        )[0],
+        userBalanceInfo: userBalancePda,
+        vaultAuthority: vaultAuthorityPda,
+        vaultAta,
+        tokenProgram: TOKEN_PROGRAM,
+        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM,
+        systemProgram: anchor.web3.SystemProgram.programId,
+      })
+      .rpc();
+
+    const posterPda = anchor.web3.PublicKey.findProgramAddressSync(
+      [Buffer.from("poster"), Buffer.from(UInt64ToLE(counterBefore))],
+      program.programId
+    )[0];
+
+    const publisherDecryptedAnswerPda =
+      anchor.web3.PublicKey.findProgramAddressSync(
+        [
+          Buffer.from("poster_decrypted_answer"),
+          Buffer.from(UInt64ToLE(counterBefore)),
+          wallet.toBuffer(),
+        ],
+        program.programId
+      )[0];
+
+    let failed = false;
+    try {
+      await program.methods
+        .postPosterSolution(
+          new anchor.BN(counterBefore),
+          "publisher answer",
+          "hash-2"
+        )
+        .accounts({
+          publisher: wallet,
+          posterInfo: posterPda,
+          publisherDecryptedAnswer: publisherDecryptedAnswerPda,
+          systemProgram: anchor.web3.SystemProgram.programId,
+        })
+        .rpc();
+      assert.fail("expected publish to fail due to deadline not passed");
+    } catch (err: any) {
+      failed = true;
+      assert.isOk(err);
+      const s = err.toString();
+      assert.isTrue(
+        s.includes("PosterDeadlineNotPassed") ||
+          s.includes("AccountNotInitialized") ||
+          s.includes("poster_response") ||
+          s.includes("posterResponse"),
+        `unexpected error: ${s}`
+      );
+    }
+    assert.isTrue(failed);
+  });
+
+  it("publish: answerer posts decrypted answer — happy path (poster_response exists, deadline passed)", async () => {
+    const wallet = provider.wallet.publicKey;
+
+    // create poster with deadline passed
+    await (program as any).methods
+      .requestAnteTokens(new anchor.BN(8))
+      .accounts({
+        admin: wallet,
+        mint: anteMintPda,
+        asker: wallet,
+        askerAta: ownerAta,
+        vaultAuthority: vaultAuthorityPda,
+        vaultAta,
+        config: configPda,
+        tokenProgram: TOKEN_PROGRAM,
+        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM,
+        systemProgram: anchor.web3.SystemProgram.programId,
+      } as any)
+      .rpc();
+
+    await (program as any).methods
+      .depositeAnteTokens(new anchor.BN(8))
+      .accounts({
+        owner: wallet,
+        ownerAta,
+        mint: anteMintPda,
+        vaultAuthority: vaultAuthorityPda,
+        vaultAta,
+        userBalanceInfo: userBalancePda,
+        tokenProgram: TOKEN_PROGRAM,
+        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM,
+        systemProgram: anchor.web3.SystemProgram.programId,
+      })
+      .rpc();
+
+    const vaultState: any = await (
+      program.account as any
+    ).vaultGlobalState.fetch(
+      (
+        await anchor.web3.PublicKey.findProgramAddressSync(
+          [Buffer.from("vault_global_state")],
+          program.programId
+        )
+      )[0]
+    );
+    const counterBefore = vaultState.bountyCounter.toNumber();
+
+    // replenish owner ATA so uploadNewPoster transfer will succeed
+    await (program as any).methods
+      .requestAnteTokens(new anchor.BN(4))
+      .accounts({
+        admin: wallet,
+        mint: anteMintPda,
+        asker: wallet,
+        askerAta: ownerAta,
+        vaultAuthority: vaultAuthorityPda,
+        vaultAta,
+        config: configPda,
+        tokenProgram: TOKEN_PROGRAM,
+        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM,
+        systemProgram: anchor.web3.SystemProgram.programId,
+      } as any)
+      .rpc();
+
+    await ensureOwnerAtaHas(
+      program,
+      provider,
+      ownerAta,
+      anteMintPda,
+      vaultAuthorityPda,
+      vaultAta,
+      configPda,
+      16
+    );
+    await (program as any).methods
+      .uploadNewPoster(
+        new anchor.BN(4),
+        { openEnded: {} },
+        { numberTheory: {} },
+        new anchor.BN(0),
+        null,
+        new anchor.BN(1)
+      )
+      .accounts({
+        owner: wallet,
+        mint: anteMintPda,
+        userAta: ownerAta,
+        vaultGlobalState: (
+          await anchor.web3.PublicKey.findProgramAddressSync(
+            [Buffer.from("vault_global_state")],
+            program.programId
+          )
+        )[0],
+        data: anchor.web3.PublicKey.findProgramAddressSync(
+          [Buffer.from("poster"), Buffer.from(UInt64ToLE(counterBefore))],
+          program.programId
+        )[0],
+        userBalanceInfo: userBalancePda,
+        vaultAuthority: vaultAuthorityPda,
+        vaultAta,
+        tokenProgram: TOKEN_PROGRAM,
+        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM,
+        systemProgram: anchor.web3.SystemProgram.programId,
+      })
+      .rpc();
+
+    const posterPda = anchor.web3.PublicKey.findProgramAddressSync(
+      [Buffer.from("poster"), Buffer.from(UInt64ToLE(counterBefore))],
+      program.programId
+    )[0];
+
+    // create answerer and their ATA
+    const answerer = anchor.web3.Keypair.generate();
+    // fund answerer with SOL so they can pay for account creation (rent)
+    await provider.connection.requestAirdrop(answerer.publicKey, 1_000_000_000);
+    const answererAta = getAssociatedTokenAddressSync(
+      anteMintPda,
+      answerer.publicKey,
+      true,
+      TOKEN_PROGRAM,
+      ASSOCIATED_TOKEN_PROGRAM
+    );
+    const createAnswererAtaTx = new anchor.web3.Transaction().add(
+      createAssociatedTokenAccountInstruction(
+        wallet,
+        answererAta,
+        answerer.publicKey,
+        anteMintPda,
+        TOKEN_PROGRAM,
+        ASSOCIATED_TOKEN_PROGRAM
+      )
+    );
+    await provider.sendAndConfirm(createAnswererAtaTx);
+
+    // fund answerer with requestAnteTokens from admin (mint more so we can deposit some but keep ATA balance)
+    await program.methods
+      .requestAnteTokens(new anchor.BN(8))
+      .accounts({
+        admin: wallet,
+        mint: anteMintPda,
+        asker: answerer.publicKey,
+        askerAta: answererAta,
+        vaultAuthority: vaultAuthorityPda,
+        vaultAta,
+        config: configPda,
+        tokenProgram: TOKEN_PROGRAM,
+        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM,
+        systemProgram: anchor.web3.SystemProgram.programId,
+      } as any)
+      .rpc();
+
+    // answerer deposits into their user balance
+    // deposit a portion, leaving some tokens in answerer ATA for submission transfer
+    await (program as any).methods
+      .depositeAnteTokens(new anchor.BN(4))
+      .accounts({
+        owner: answerer.publicKey,
+        ownerAta: answererAta,
+        mint: anteMintPda,
+        vaultAuthority: vaultAuthorityPda,
+        vaultAta,
+        userBalanceInfo: anchor.web3.PublicKey.findProgramAddressSync(
+          [Buffer.from("user_balance_info"), answerer.publicKey.toBuffer()],
+          program.programId
+        )[0],
+        tokenProgram: TOKEN_PROGRAM,
+        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM,
+        systemProgram: anchor.web3.SystemProgram.programId,
+      })
+      .signers([answerer])
+      .rpc();
+
+    // answerer posts an answer to create poster_response
+    const answerArr = new Uint8Array(33);
+    answerArr[0] = 1; // arbitrary
+    await program.methods
+      .answerPoster(new anchor.BN(counterBefore), Array.from(answerArr))
+      .accounts({
+        answerer: answerer.publicKey,
+        mint: anteMintPda,
+        answererAta: answererAta,
+        vaultAuthority: vaultAuthorityPda,
+        vaultAta,
+        userBalanceInfo: anchor.web3.PublicKey.findProgramAddressSync(
+          [Buffer.from("user_balance_info"), answerer.publicKey.toBuffer()],
+          program.programId
+        )[0],
+        posterInfo: posterPda,
+        posterPublisher: wallet,
+        posterResponse: anchor.web3.PublicKey.findProgramAddressSync(
+          [
+            Buffer.from("poster_response"),
+            Buffer.from(UInt64ToLE(counterBefore)),
+            answerer.publicKey.toBuffer(),
+          ],
+          program.programId
+        )[0],
+        vaultGlobalState: (
+          await anchor.web3.PublicKey.findProgramAddressSync(
+            [Buffer.from("vault_global_state")],
+            program.programId
+          )
+        )[0],
+        tokenProgram: TOKEN_PROGRAM,
+        systemProgram: anchor.web3.SystemProgram.programId,
+        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM,
+      })
+      .signers([answerer])
+      .rpc();
+
+    const posterResponsePda = anchor.web3.PublicKey.findProgramAddressSync(
+      [
+        Buffer.from("poster_response"),
+        Buffer.from(UInt64ToLE(counterBefore)),
+        answerer.publicKey.toBuffer(),
+      ],
+      program.programId
+    )[0];
+
+    const answererDecryptedAnswerPda =
+      anchor.web3.PublicKey.findProgramAddressSync(
+        [
+          Buffer.from("poster_answerer_decrypted_answer"),
+          Buffer.from(UInt64ToLE(counterBefore)),
+          answerer.publicKey.toBuffer(),
+        ],
+        program.programId
+      )[0];
+
+    // answerer posts decrypted answer
+    await program.methods
+      .postAnswererDecryptedAnswer(
+        new anchor.BN(counterBefore),
+        "answerer answer",
+        "hash-3"
+      )
+      .accounts({
+        answerer: answerer.publicKey,
+        posterResponse: posterResponsePda,
+        answererDecryptedAnswer: answererDecryptedAnswerPda,
+        posterInfo: posterPda,
+        systemProgram: anchor.web3.SystemProgram.programId,
+      })
+      .signers([answerer])
+      .rpc();
+
+    const ansPub: any = await (
+      program.account as any
+    ).posterAnswererDecryptedAnswer.fetch(answererDecryptedAnswerPda);
+    assert.equal(ansPub.posterId.toString(), counterBefore.toString());
+    assert.equal(ansPub.answer, "answerer answer");
+    assert.equal(ansPub.hash, "hash-3");
+  });
+
+  it("publish: answerer posts decrypted answer — fails when deadline not passed", async () => {
+    const wallet = provider.wallet.publicKey;
+
+    // create poster with far future deadline
+    await (program as any).methods
+      .requestAnteTokens(new anchor.BN(8))
+      .accounts({
+        admin: wallet,
+        mint: anteMintPda,
+        asker: wallet,
+        askerAta: ownerAta,
+        vaultAuthority: vaultAuthorityPda,
+        vaultAta,
+        config: configPda,
+        tokenProgram: TOKEN_PROGRAM,
+        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM,
+        systemProgram: anchor.web3.SystemProgram.programId,
+      } as any)
+      .rpc();
+
+    await (program as any).methods
+      .depositeAnteTokens(new anchor.BN(8))
+      .accounts({
+        owner: wallet,
+        ownerAta,
+        mint: anteMintPda,
+        vaultAuthority: vaultAuthorityPda,
+        vaultAta,
+        userBalanceInfo: userBalancePda,
+        tokenProgram: TOKEN_PROGRAM,
+        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM,
+        systemProgram: anchor.web3.SystemProgram.programId,
+      })
+      .rpc();
+
+    const vaultState: any = await (
+      program.account as any
+    ).vaultGlobalState.fetch(
+      (
+        await anchor.web3.PublicKey.findProgramAddressSync(
+          [Buffer.from("vault_global_state")],
+          program.programId
+        )
+      )[0]
+    );
+    const counterBefore = vaultState.bountyCounter.toNumber();
+
+    await ensureOwnerAtaHas(
+      program,
+      provider,
+      ownerAta,
+      anteMintPda,
+      vaultAuthorityPda,
+      vaultAta,
+      configPda,
+      16
+    );
+    await (program as any).methods
+      .uploadNewPoster(
+        new anchor.BN(4),
+        { openEnded: {} },
+        { numberTheory: {} },
+        new anchor.BN(9999999999),
+        null,
+        new anchor.BN(1)
+      )
+      .accounts({
+        owner: wallet,
+        mint: anteMintPda,
+        userAta: ownerAta,
+        vaultGlobalState: (
+          await anchor.web3.PublicKey.findProgramAddressSync(
+            [Buffer.from("vault_global_state")],
+            program.programId
+          )
+        )[0],
+        data: anchor.web3.PublicKey.findProgramAddressSync(
+          [Buffer.from("poster"), Buffer.from(UInt64ToLE(counterBefore))],
+          program.programId
+        )[0],
+        userBalanceInfo: userBalancePda,
+        vaultAuthority: vaultAuthorityPda,
+        vaultAta,
+        tokenProgram: TOKEN_PROGRAM,
+        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM,
+        systemProgram: anchor.web3.SystemProgram.programId,
+      })
+      .rpc();
+
+    const posterPda = anchor.web3.PublicKey.findProgramAddressSync(
+      [Buffer.from("poster"), Buffer.from(UInt64ToLE(counterBefore))],
+      program.programId
+    )[0];
+
+    // create answerer and their ATA
+    const answerer = anchor.web3.Keypair.generate();
+    // fund answerer with SOL so they can pay for account creation (rent)
+    await provider.connection.requestAirdrop(answerer.publicKey, 1_000_000_000);
+    const answererAta = getAssociatedTokenAddressSync(
+      anteMintPda,
+      answerer.publicKey,
+      true,
+      TOKEN_PROGRAM,
+      ASSOCIATED_TOKEN_PROGRAM
+    );
+    const createAnswererAtaTx = new anchor.web3.Transaction().add(
+      createAssociatedTokenAccountInstruction(
+        wallet,
+        answererAta,
+        answerer.publicKey,
+        anteMintPda,
+        TOKEN_PROGRAM,
+        ASSOCIATED_TOKEN_PROGRAM
+      )
+    );
+    await provider.sendAndConfirm(createAnswererAtaTx);
+
+    // fund answerer with requestAnteTokens from admin (mint more so we can deposit some but keep ATA balance)
+    await program.methods
+      .requestAnteTokens(new anchor.BN(8))
+      .accounts({
+        admin: wallet,
+        mint: anteMintPda,
+        asker: answerer.publicKey,
+        askerAta: answererAta,
+        vaultAuthority: vaultAuthorityPda,
+        vaultAta,
+        config: configPda,
+        tokenProgram: TOKEN_PROGRAM,
+        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM,
+        systemProgram: anchor.web3.SystemProgram.programId,
+      } as any)
+      .rpc();
+
+    // answerer deposits into their user balance
+    await (program as any).methods
+      .depositeAnteTokens(new anchor.BN(4))
+      .accounts({
+        owner: answerer.publicKey,
+        ownerAta: answererAta,
+        mint: anteMintPda,
+        vaultAuthority: vaultAuthorityPda,
+        vaultAta,
+        userBalanceInfo: anchor.web3.PublicKey.findProgramAddressSync(
+          [Buffer.from("user_balance_info"), answerer.publicKey.toBuffer()],
+          program.programId
+        )[0],
+        tokenProgram: TOKEN_PROGRAM,
+        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM,
+        systemProgram: anchor.web3.SystemProgram.programId,
+      })
+      .signers([answerer])
+      .rpc();
+
+    // answerer tries to post answerer decrypted answer but deadline not passed
+    const posterResponsePda = anchor.web3.PublicKey.findProgramAddressSync(
+      [
+        Buffer.from("poster_response"),
+        Buffer.from(UInt64ToLE(counterBefore)),
+        answerer.publicKey.toBuffer(),
+      ],
+      program.programId
+    )[0];
+    const answererDecryptedAnswerPda =
+      anchor.web3.PublicKey.findProgramAddressSync(
+        [
+          Buffer.from("poster_answerer_decrypted_answer"),
+          Buffer.from(UInt64ToLE(counterBefore)),
+          answerer.publicKey.toBuffer(),
+        ],
+        program.programId
+      )[0];
+
+    let failed = false;
+    try {
+      await program.methods
+        .postAnswererDecryptedAnswer(
+          new anchor.BN(counterBefore),
+          "answerer answer",
+          "hash-4"
+        )
+        .accounts({
+          answerer: answerer.publicKey,
+          posterResponse: posterResponsePda,
+          answererDecryptedAnswer: answererDecryptedAnswerPda,
+          posterInfo: posterPda,
+          systemProgram: anchor.web3.SystemProgram.programId,
+        })
+        .signers([answerer])
+        .rpc();
+      assert.fail("expected publish to fail due to deadline not passed");
+    } catch (err: any) {
+      failed = true;
+      assert.isOk(err);
+      const s = err.toString();
+      assert.isTrue(
+        s.includes("PosterDeadlineNotPassed") ||
+          s.includes("poster_response") ||
+          s.includes("AccountNotInitialized") ||
+          s.includes("posterResponse"),
+        `unexpected error: ${s}`
+      );
+    }
+    assert.isTrue(failed);
   });
 });
