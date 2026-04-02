@@ -149,6 +149,11 @@ pub mod challenge_protocol {
             .is_some(),
             ChallengeProtocolError::InsufficientAnteTokens
         );
+        let current_time = Clock::get()?.unix_timestamp as u64;
+        require!(
+            ctx.accounts.poster_info.deadline <= current_time,
+            ChallengeProtocolError::PosterDeadlineNotPassed
+        );
         let token_prgram = ctx.accounts.token_program.to_account_info();
         let req = TransferChecked {
             from: ctx.accounts.answerer_ata.to_account_info(),
@@ -176,6 +181,14 @@ pub mod challenge_protocol {
             }
         });
 
+        Ok(())
+    }
+    pub fn no_submission_poster(ctx: Context<NoSubmissionPoster>, poster_id: u64) -> Result<()> {
+        let poster_info = &ctx.accounts.poster_info;
+        require!(
+            Clock::get()?.unix_timestamp as u64 > poster_info.deadline,
+            ChallengeProtocolError::InsufficientAnteTokens
+        );
         Ok(())
     }
 }
@@ -481,6 +494,10 @@ pub enum ChallengeProtocolError {
     IncorrectTokenRequestAmount,
     #[msg("insufficient ante tokens in vault")]
     InsufficientAnteTokens,
+    #[msg("poster deadline has not passed yet")]
+    PosterDeadlineNotPassed,
+    #[msg("poster deadline has passed, no submission allowed")]
+    PosterDeadlinePassed,
 }
 
 #[account]
