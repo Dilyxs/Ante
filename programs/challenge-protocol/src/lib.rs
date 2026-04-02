@@ -1,13 +1,14 @@
 use anchor_lang::prelude::*;
+use anchor_lang::solana_program::sysvar::clock::Clock;
 use anchor_spl::associated_token::AssociatedToken;
 use anchor_spl::token_2022::MintTo;
+use anchor_spl::token_2022::TransferChecked;
 use anchor_spl::token_interface;
 use anchor_spl::token_interface::{Mint, TokenAccount, TokenInterface};
-const ANCHOR_DISCRIMINATOR: usize = 8;
-use anchor_lang::solana_program::sysvar::clock::Clock;
-use anchor_spl::token_2022::TransferChecked;
-const TOKEN_DEMICAL: u8 = 6;
 pub mod helper;
+const TOKEN_DEMICAL: u8 = 6;
+const ANCHOR_DISCRIMINATOR: usize = 8;
+const ONE_WEEK_IN_SECONDS: u64 = 604800;
 declare_id!("FraezYKQ1zKbysJJK7jYGr8J2ZVt5Cyz3GrQ3WSDLQyS");
 
 #[program]
@@ -262,7 +263,91 @@ pub mod challenge_protocol {
         });
         Ok(())
     }
+    pub fn refund_answerer_where_poster_didnt_post_solution(
+        ctx: Context<RefundAnswererWherePosterDidntPostSolution>,
+        poster_id: u64,
+    ) -> Result<()> {
+        require!(
+            Clock::get()?.unix_timestamp as u64
+                > ctx.accounts.poster_info.deadline + ONE_WEEK_IN_SECONDS,
+            ChallengeProtocolError::OneWeekDeadlineNotPassed
+        );
+        require!(
+            u64::checked_add(
+                ctx.accounts.user_balance_info.balance,
+                ctx.accounts.poster_info.submission_cost
+            )
+            .is_some(),
+            ChallengeProtocolError::OverflowError
+        );
+        let token_prgram = ctx.accounts.token_program.to_account_info();
+        let req = TransferChecked {
+            from: ctx.accounts.vault_ata.to_account_info(),
+            to: ctx.accounts.poster_response_answerer_ata.to_account_info(),
+            authority: ctx.accounts.vault_authority.to_account_info(),
+            mint: ctx.accounts.mint.to_account_info(),
+        };
+        let seeds: &[&[&[u8]]] = &[&[b"authority", &[ctx.bumps.vault_authority]]];
+        let cpi_transfer_ctx = CpiContext::new_with_signer(token_prgram, req, seeds);
+        token_interface::transfer_checked(
+            cpi_transfer_ctx,
+            ctx.accounts.poster_info.submission_cost,
+            TOKEN_DEMICAL,
+        )?;
+        ctx.accounts.user_balance_info.balance += ctx.accounts.poster_info.submission_cost;
+        Ok(())
+    }
 }
+#[derive(Accounts)]
+#[instruction(poster_id: u64)]
+pub struct RefundAnswererWherePosterDidntPostSolution<'info> {
+    #[account(mut)]
+    pub admin: Signer<'info>,
+    #[account(mut,
+    seeds=[b"config"],
+    bump,
+    has_one = admin
+    )]
+    pub config: Account<'info, Config>,
+    #[account(mut,
+    seeds=[b"vault_authority"],
+    bump)]
+    ///CHECK: vault_authority is safe
+    pub vault_authority: UncheckedAccount<'info>,
+    #[account(mut,
+        seeds=[b"Ante"],
+        bump
+    )]
+    pub mint: InterfaceAccount<'info, Mint>,
+    #[account(mut,
+    associated_token::mint=mint,
+    associated_token::authority=vault_authority,
+    )]
+    pub vault_ata: InterfaceAccount<'info, TokenAccount>,
+    ///CHECK: poster_publisher is safe since we are only sending tokens to them
+    pub poster_publisher: UncheckedAccount<'info>,
+    #[account(mut,
+    seeds=[b"poster_response", poster_id.to_le_bytes().as_ref(), poster_publisher.key().as_ref()],
+    bump)]
+    pub poster_response: Account<'info, PosterResponse>,
+    #[account(mut,
+    seeds=[b"user_balance_info", poster_publisher.key().as_ref()],
+        bump)]
+    pub user_balance_info: Account<'info, UserBalance>,
+    #[account(mut,
+    seeds=[b"poster", poster_id.to_le_bytes().as_ref()],
+    bump)]
+    pub poster_info: Account<'info, Poster>,
+    #[account(mut,
+    associated_token::mint=mint,
+    associated_token::authority=vault_authority,
+    )]
+    pub poster_response_answerer_ata: InterfaceAccount<'info, TokenAccount>,
+    pub token_program: Interface<'info, TokenInterface>,
+    pub system_program: Program<'info, System>,
+    pub associated_token_program: Program<'info, AssociatedToken>,
+}
+
 #[derive(Accounts)]
 #[instruction(poster_id: u64)]
 pub struct PostAnswererDecryptedAnswer<'info> {
@@ -507,6 +592,12 @@ pub struct UploadNewPoster<'info> {
     associated_token::mint=mint,
     associated_token::authority=vault_authority,)]
     pub vault_ata: InterfaceAccount<'info, TokenAccount>,
+    #[account(init,
+    seeds=[b"post_winner", vault_global_state.bounty_counter.to_le_bytes().as_ref()],
+    bump,
+    space=ANCHOR_DISCRIMINATOR + PostingWinner::INIT_SPACE,
+    payer=owner)]
+    pub posting_winner: Account<'info, PostingWinner>,
     pub token_program: Interface<'info, TokenInterface>,
     pub system_program: Program<'info, System>,
     pub associated_token_program: Program<'info, AssociatedToken>,
@@ -683,6 +774,12 @@ pub struct PosterAnswererDecryptedAnswerInfo {
     pub answer: String,
     pub hash: String,
 }
+#[account]
+#[derive(InitSpace)]
+pub struct PostingWinner {
+    pub poster_id: u64,
+    pub winner_id: Pubkey,
+}
 #[error_code]
 pub enum ChallengeProtocolError {
     #[msg("incorrect token request amount")]
@@ -695,6 +792,8 @@ pub enum ChallengeProtocolError {
     PosterDeadlinePassed,
     #[msg("overflow error")]
     OverflowError,
+    #[msg("1 week deadline has not passed yet")]
+    OneWeekDeadlineNotPassed,
 }
 
 #[account]
