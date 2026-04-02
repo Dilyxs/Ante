@@ -482,6 +482,8 @@ describe("challenge-protocol", () => {
     const posterAcct: any = await (program.account as any).poster.fetch(
       posterPda
     );
+    // new: poster now stores publisher (owner)
+    assert.ok(posterAcct.publisher.equals(wallet));
     assert.equal(
       posterAcct.bountyMinimumGain.toString(),
       bountyMinimumGain.toString()
