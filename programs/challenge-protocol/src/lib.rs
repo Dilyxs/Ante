@@ -153,7 +153,7 @@ pub mod challenge_protocol {
         );
         let current_time = Clock::get()?.unix_timestamp as u64;
         require!(
-            ctx.accounts.poster_info.deadline <= current_time,
+            ctx.accounts.poster_info.deadline >= current_time,
             ChallengeProtocolError::PosterDeadlineNotPassed
         );
         let token_prgram = ctx.accounts.token_program.to_account_info();
@@ -431,7 +431,7 @@ pub struct RefundAnswererWherePosterDidntPostSolution<'info> {
     )]
     pub config: Account<'info, Config>,
     #[account(mut,
-    seeds=[b"vault_authority"],
+    seeds=[b"authority"],
     bump)]
     ///CHECK: vault_authority is safe
     pub vault_authority: UncheckedAccount<'info>,
@@ -525,7 +525,7 @@ pub struct NoSubmissionPoster<'info> {
     )]
     pub config: Account<'info, Config>,
     #[account(mut,
-    seeds=[b"vault_authority"],
+    seeds=[b"authority"],
     bump)]
     ///CHECK: vault_authority is safe
     pub vault_authority: UncheckedAccount<'info>,
