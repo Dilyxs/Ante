@@ -295,8 +295,129 @@ pub mod challenge_protocol {
             TOKEN_DEMICAL,
         )?;
         ctx.accounts.user_balance_info.balance += ctx.accounts.poster_info.submission_cost;
+        emit!(PublisherNotResponded { poster_id });
         Ok(())
     }
+    pub fn post_poster_winner(
+        ctx: Context<PostPosterWinner>,
+        poster_id: u64,
+        winner: Pubkey,
+        contestains_count: u64,
+    ) -> Result<()> {
+        require!(
+            Clock::get()?.unix_timestamp as u64
+                > ctx.accounts.poster_info.deadline + ONE_WEEK_IN_SECONDS,
+            ChallengeProtocolError::OneWeekDeadlineNotPassed
+        );
+        let token_prgram = ctx.accounts.token_program.to_account_info();
+        let req = TransferChecked {
+            from: ctx.accounts.vault_ata.to_account_info(),
+            to: ctx.accounts.winner_ata.to_account_info(),
+            authority: ctx.accounts.vault_authority.to_account_info(),
+            mint: ctx.accounts.mint.to_account_info(),
+        };
+        let seeds: &[&[&[u8]]] = &[&[b"authority", &[ctx.bumps.vault_authority]]];
+        let cpi_transfer_ctx = CpiContext::new_with_signer(token_prgram, req, seeds);
+        let winner_share = contestains_count * ctx.accounts.poster_info.submission_cost
+            + ctx.accounts.poster_info.bounty_minimum_gain;
+        token_interface::transfer_checked(cpi_transfer_ctx, winner_share, TOKEN_DEMICAL)?;
+        //BUG: could have overflow here
+        ctx.accounts.user_balance_info.balance += winner_share;
+        ctx.accounts.post_winner.poster_id = poster_id;
+        ctx.accounts.post_winner.winner_id = winner;
+        emit!(PosterWinnerPostedEvent { poster_id, winner });
+        Ok(())
+    }
+    pub fn vote_for_winner(
+        ctx: Context<VotingWinner>,
+        poster_id: u64,
+        winner: Pubkey,
+    ) -> Result<()> {
+        ctx.accounts.vote_for_winner.poster_id = poster_id;
+        ctx.accounts.vote_for_winner.voter = ctx.accounts.voter.key();
+        ctx.accounts.vote_for_winner.winner_vote = winner;
+        ctx.accounts.vote_for_winner.response_id = ctx.accounts.poster_response.answer_id;
+        emit!(VoteForWinnerPosted {
+            poster_id,
+            voter: ctx.accounts.voter.key(),
+            winner
+        });
+        Ok(())
+    }
+}
+#[derive(Accounts)]
+#[instruction(poster_id: u64)]
+pub struct VotingWinner<'info> {
+    #[account(mut)]
+    pub voter: Signer<'info>,
+    #[account(mut,
+    seeds=[b"poster", poster_id.to_le_bytes().as_ref()],
+    bump)]
+    pub poster_info: Account<'info, Poster>,
+    #[account(mut,
+    seeds=[b"poster_decrypted_answer", poster_id.to_le_bytes().as_ref(), voter.key().as_ref()],
+    bump)]
+    pub poster_decrypted_response: Account<'info, PosterPublisherDecryptedAnswer>,
+    #[account(init,
+        payer=voter,
+        space=ANCHOR_DISCRIMINATOR + VoteForWinner::INIT_SPACE,
+    seeds=[b"vote_for_winner", poster_id.to_le_bytes().as_ref(), voter.key().as_ref()],
+    bump)]
+    pub vote_for_winner: Account<'info, VoteForWinner>,
+    #[account(mut,
+    seeds=[b"poster_response", poster_id.to_le_bytes().as_ref(), voter.key().as_ref()],
+    bump)]
+    pub poster_response: Account<'info, PosterResponse>,
+    pub system_program: Program<'info, System>,
+}
+
+#[derive(Accounts)]
+#[instruction(poster_id: u64)]
+pub struct PostPosterWinner<'info> {
+    #[account(mut)]
+    pub admin: Signer<'info>,
+    #[account(mut,
+    seeds=[b"config"],
+    bump,
+    has_one = admin
+    )]
+    pub config: Account<'info, Config>,
+    #[account(mut,
+    seeds=[b"post_winner", poster_id.to_le_bytes().as_ref()],
+    bump)]
+    pub post_winner: Account<'info, PostingWinner>,
+    #[account(mut,
+    seeds=[b"poster", poster_id.to_le_bytes().as_ref()],
+    bump)]
+    pub poster_info: Account<'info, Poster>,
+    #[account(mut,
+    seeds=[b"user_balance_info", winner.key().as_ref()],
+        bump)]
+    pub user_balance_info: Account<'info, UserBalance>,
+    #[account(mut,
+seeds=[b"authority"],
+bump)]
+    ///CHECK: vault_authority is safe
+    pub vault_authority: UncheckedAccount<'info>,
+    #[account(mut,
+associated_token::mint=mint,
+associated_token::authority=vault_authority,)]
+    pub vault_ata: InterfaceAccount<'info, TokenAccount>,
+    #[account(mut)]
+    ///CHECK: winner is safe since we are only transfering tokens to them
+    pub winner: UncheckedAccount<'info>,
+    #[account(mut,
+associated_token::mint=mint,
+associated_token::authority=winner,)]
+    pub winner_ata: InterfaceAccount<'info, TokenAccount>,
+    #[account(mut,
+    seeds=[b"Ante"],
+    bump
+)]
+    pub mint: InterfaceAccount<'info, Mint>,
+    pub token_program: Interface<'info, TokenInterface>,
+    pub system_program: Program<'info, System>,
+    pub associated_token_program: Program<'info, AssociatedToken>,
 }
 #[derive(Accounts)]
 #[instruction(poster_id: u64)]
@@ -320,7 +441,8 @@ pub struct RefundAnswererWherePosterDidntPostSolution<'info> {
     )]
     pub mint: InterfaceAccount<'info, Mint>,
     #[account(mut,
-    associated_token::mint=mint,
+    associated_token::mint = mint,
+        associated_token::token_program = token_program,
     associated_token::authority=vault_authority,
     )]
     pub vault_ata: InterfaceAccount<'info, TokenAccount>,
@@ -780,6 +902,14 @@ pub struct PostingWinner {
     pub poster_id: u64,
     pub winner_id: Pubkey,
 }
+#[account]
+#[derive(InitSpace)]
+pub struct VoteForWinner {
+    pub poster_id: u64,
+    pub response_id: u64,
+    pub voter: Pubkey,
+    pub winner_vote: Pubkey,
+}
 #[error_code]
 pub enum ChallengeProtocolError {
     #[msg("incorrect token request amount")]
@@ -832,4 +962,19 @@ pub struct PosterPublishAnswered {
 pub struct AnswererDecryptedAnswerPosted {
     pub answerer: Pubkey,
     pub answerer_decrypted_answer: PosterAnswererDecryptedAnswerInfo,
+}
+#[event]
+pub struct PosterWinnerPostedEvent {
+    pub poster_id: u64,
+    pub winner: Pubkey,
+}
+#[event]
+pub struct PublisherNotResponded {
+    pub poster_id: u64,
+}
+#[event]
+pub struct VoteForWinnerPosted {
+    pub poster_id: u64,
+    pub voter: Pubkey,
+    pub winner: Pubkey,
 }
