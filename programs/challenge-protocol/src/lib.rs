@@ -169,6 +169,7 @@ pub mod challenge_protocol {
             ctx.accounts.poster_info.submission_cost,
             TOKEN_DEMICAL,
         )?;
+        ctx.accounts.poster_response.answer_id = ctx.accounts.vault_global_state.response_counter;
         ctx.accounts.poster_response.time = Clock::get()?.unix_timestamp as u64;
         ctx.accounts.poster_response.answerer = ctx.accounts.answerer.key();
         ctx.accounts.vault_global_state.response_counter += 1;
@@ -188,9 +189,10 @@ pub mod challenge_protocol {
         Ok(())
     }
     pub fn no_submission_poster(ctx: Context<NoSubmissionPoster>, poster_id: u64) -> Result<()> {
+        // ensure the poster deadline has passed
         require!(
             Clock::get()?.unix_timestamp as u64 > ctx.accounts.poster_info.deadline,
-            ChallengeProtocolError::InsufficientAnteTokens
+            ChallengeProtocolError::PosterDeadlineNotPassed
         );
         require!(
             u64::checked_add(
@@ -318,11 +320,25 @@ pub mod challenge_protocol {
         };
         let seeds: &[&[&[u8]]] = &[&[b"authority", &[ctx.bumps.vault_authority]]];
         let cpi_transfer_ctx = CpiContext::new_with_signer(token_prgram, req, seeds);
-        let winner_share = contestains_count * ctx.accounts.poster_info.submission_cost
-            + ctx.accounts.poster_info.bounty_minimum_gain;
+        // compute winner share using checked arithmetic to avoid overflow
+        let total_from_contestants = ctx
+            .accounts
+            .poster_info
+            .submission_cost
+            .checked_mul(contestains_count)
+            .ok_or(ChallengeProtocolError::OverflowError)?;
+        let winner_share = total_from_contestants
+            .checked_add(ctx.accounts.poster_info.bounty_minimum_gain)
+            .ok_or(ChallengeProtocolError::OverflowError)?;
+
         token_interface::transfer_checked(cpi_transfer_ctx, winner_share, TOKEN_DEMICAL)?;
-        //BUG: could have overflow here
-        ctx.accounts.user_balance_info.balance += winner_share;
+        // update winner's balance safely
+        ctx.accounts.user_balance_info.balance = ctx
+            .accounts
+            .user_balance_info
+            .balance
+            .checked_add(winner_share)
+            .ok_or(ChallengeProtocolError::OverflowError)?;
         ctx.accounts.post_winner.poster_id = poster_id;
         ctx.accounts.post_winner.winner_id = winner;
         emit!(PosterWinnerPostedEvent { poster_id, winner });
