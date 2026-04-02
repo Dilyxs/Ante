@@ -33,6 +33,17 @@ describe("challenge-protocol", () => {
   let vaultAta: anchor.web3.PublicKey;
   let ownerAta: anchor.web3.PublicKey;
 
+  // helper to encode u64 little-endian
+  function UInt64ToLE(n: number): Buffer {
+    const buf = Buffer.alloc(8);
+    let v = BigInt(n);
+    for (let i = 0; i < 8; i++) {
+      buf[i] = Number(v & BigInt(0xff));
+      v >>= BigInt(8);
+    }
+    return buf;
+  }
+
   before(async () => {
     const wallet = provider.wallet.publicKey;
     [vaultAuthorityPda] = anchor.web3.PublicKey.findProgramAddressSync(
@@ -350,5 +361,212 @@ describe("challenge-protocol", () => {
     }
 
     assert.isTrue(failed, "withdraw above balance should fail");
+  });
+
+  it("poster: create poster happy path (sufficient balance)", async () => {
+    const wallet = provider.wallet.publicKey;
+
+    // ensure owner ATA exists
+    const ownerAtaAccount = await provider.connection.getAccountInfo(ownerAta);
+    if (!ownerAtaAccount) {
+      const createOwnerAtaTx = new anchor.web3.Transaction().add(
+        createAssociatedTokenAccountInstruction(
+          wallet,
+          ownerAta,
+          wallet,
+          anteMintPda,
+          TOKEN_PROGRAM,
+          ASSOCIATED_TOKEN_PROGRAM
+        )
+      );
+      await provider.sendAndConfirm(createOwnerAtaTx);
+    }
+
+    // deposit enough tokens for bounty_minimum_gain
+    const depositAmount = new anchor.BN(10);
+    await (program as any).methods
+      .requestAnteTokens(new anchor.BN(8))
+      .accounts({
+        admin: wallet,
+        mint: anteMintPda,
+        asker: wallet,
+        askerAta: ownerAta,
+        vaultAuthority: vaultAuthorityPda,
+        vaultAta,
+        config: configPda,
+        tokenProgram: TOKEN_PROGRAM,
+        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM,
+        systemProgram: anchor.web3.SystemProgram.programId,
+      } as any)
+      .rpc();
+
+    // deposit into program balance
+    const beforeOwner = await getAccount(provider.connection, ownerAta);
+    const beforeVault = await getAccount(provider.connection, vaultAta);
+    await (program as any).methods
+      .depositeAnteTokens(depositAmount)
+      .accounts({
+        owner: wallet,
+        ownerAta,
+        mint: anteMintPda,
+        vaultAuthority: vaultAuthorityPda,
+        vaultAta,
+        userBalanceInfo: userBalancePda,
+        tokenProgram: TOKEN_PROGRAM,
+        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM,
+        systemProgram: anchor.web3.SystemProgram.programId,
+      })
+      .rpc();
+
+    const afterOwner = await getAccount(provider.connection, ownerAta);
+    const afterVault = await getAccount(provider.connection, vaultAta);
+    assert.equal(afterOwner.amount, beforeOwner.amount - BigInt(10));
+    assert.equal(afterVault.amount, beforeVault.amount + BigInt(10));
+
+    // read vault counter to derive poster PDA
+    const vaultState: any = await (
+      program.account as any
+    ).vaultGlobalState.fetch(
+      (
+        await anchor.web3.PublicKey.findProgramAddressSync(
+          [Buffer.from("vault_global_state")],
+          program.programId
+        )
+      )[0]
+    );
+    const counterBefore = vaultState.bountyCounter as number;
+
+    // create poster
+    const bountyMinimumGain = 4; // will transfer 4 tokens
+    const submissionCost = 1;
+    const deadline = 9999999999;
+    const tx = await (program as any).methods
+      .uploadNewPoster(
+        bountyMinimumGain,
+        { openEnded: {} },
+        { numberTheory: {} },
+        new anchor.BN(deadline),
+        null,
+        new anchor.BN(submissionCost)
+      )
+      .accounts({
+        owner: wallet,
+        mint: anteMintPda,
+        userAta: ownerAta,
+        vaultGlobalState: (
+          await anchor.web3.PublicKey.findProgramAddressSync(
+            [Buffer.from("vault_global_state")],
+            program.programId
+          )
+        )[0],
+        data: anchor.web3.PublicKey.findProgramAddressSync(
+          [
+            Buffer.from("poster"),
+            Buffer.from(UInt64ToLE(counterBefore)),
+            wallet.toBuffer(),
+          ],
+          program.programId
+        )[0],
+        userBalanceInfo: userBalancePda,
+        vaultAuthority: vaultAuthorityPda,
+        vaultAta,
+        tokenProgram: TOKEN_PROGRAM,
+        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM,
+        systemProgram: anchor.web3.SystemProgram.programId,
+      })
+      .rpc();
+
+    // verify token movement and user balance
+    const ownerAfterPoster = await getAccount(provider.connection, ownerAta);
+    const vaultAfterPoster = await getAccount(provider.connection, vaultAta);
+    assert.equal(
+      ownerAfterPoster.amount,
+      afterOwner.amount - BigInt(bountyMinimumGain)
+    );
+    assert.equal(
+      vaultAfterPoster.amount,
+      afterVault.amount + BigInt(bountyMinimumGain)
+    );
+
+    // fetch poster account
+    const posterPda = anchor.web3.PublicKey.findProgramAddressSync(
+      [
+        Buffer.from("poster"),
+        Buffer.from(UInt64ToLE(counterBefore)),
+        wallet.toBuffer(),
+      ],
+      program.programId
+    )[0];
+    const posterAcct: any = await (program.account as any).poster.fetch(
+      posterPda
+    );
+    assert.equal(
+      posterAcct.bountyMinimumGain.toString(),
+      bountyMinimumGain.toString()
+    );
+    assert.equal(
+      posterAcct.submissionCost.toString(),
+      submissionCost.toString()
+    );
+  });
+
+  it("poster: create poster fails when insufficient balance", async () => {
+    const wallet = provider.wallet.publicKey;
+
+    // ensure user has small balance (0)
+    // if userBalance exists, withdraw to zero
+    let userBalance: any = await (
+      program.account as any
+    ).userBalance.fetchNullable(userBalancePda);
+    // if no balance account, it's effectively zero
+
+    // attempt to create poster with large bounty
+    const largeBounty = 1000000;
+    let failed = false;
+    try {
+      await (program as any).methods
+        .uploadNewPoster(
+          largeBounty,
+          { openEnded: {} },
+          { numberTheory: {} },
+          new anchor.BN(9999999999),
+          null,
+          new anchor.BN(1)
+        )
+        .accounts({
+          owner: wallet,
+          mint: anteMintPda,
+          userAta: ownerAta,
+          vaultGlobalState: (
+            await anchor.web3.PublicKey.findProgramAddressSync(
+              [Buffer.from("vault_global_state")],
+              program.programId
+            )
+          )[0],
+          data: anchor.web3.PublicKey.findProgramAddressSync(
+            [
+              Buffer.from("poster"),
+              Buffer.from(UInt64ToLE(0)),
+              wallet.toBuffer(),
+            ],
+            program.programId
+          )[0],
+          userBalanceInfo: userBalancePda,
+          vaultAuthority: vaultAuthorityPda,
+          vaultAta,
+          tokenProgram: TOKEN_PROGRAM,
+          associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM,
+          systemProgram: anchor.web3.SystemProgram.programId,
+        })
+        .rpc();
+      assert.fail(
+        "expected poster creation to fail due to insufficient balance"
+      );
+    } catch (err: any) {
+      failed = true;
+      assert.isOk(err);
+      assert.include(err.toString(), "InsufficientAnteTokens");
+    }
+    assert.isTrue(failed, "insufficient balance must fail poster creation");
   });
 });
