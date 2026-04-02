@@ -463,11 +463,7 @@ describe("challenge-protocol", () => {
           )
         )[0],
         data: anchor.web3.PublicKey.findProgramAddressSync(
-          [
-            Buffer.from("poster"),
-            Buffer.from(UInt64ToLE(counterBefore)),
-            wallet.toBuffer(),
-          ],
+          [Buffer.from("poster"), Buffer.from(UInt64ToLE(counterBefore))],
           program.programId
         )[0],
         userBalanceInfo: userBalancePda,
@@ -493,11 +489,7 @@ describe("challenge-protocol", () => {
 
     // fetch poster account
     const posterPda = anchor.web3.PublicKey.findProgramAddressSync(
-      [
-        Buffer.from("poster"),
-        Buffer.from(UInt64ToLE(counterBefore)),
-        wallet.toBuffer(),
-      ],
+      [Buffer.from("poster"), Buffer.from(UInt64ToLE(counterBefore))],
       program.programId
     )[0];
     const posterAcct: any = await (program.account as any).poster.fetch(
@@ -547,11 +539,7 @@ describe("challenge-protocol", () => {
             )
           )[0],
           data: anchor.web3.PublicKey.findProgramAddressSync(
-            [
-              Buffer.from("poster"),
-              Buffer.from(UInt64ToLE(0)),
-              wallet.toBuffer(),
-            ],
+            [Buffer.from("poster"), Buffer.from(UInt64ToLE(0))],
             program.programId
           )[0],
           userBalanceInfo: userBalancePda,

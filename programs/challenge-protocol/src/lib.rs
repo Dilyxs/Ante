@@ -227,8 +227,8 @@ pub mod challenge_protocol {
             ChallengeProtocolError::PosterDeadlineNotPassed
         );
         ctx.accounts.publisher_decrypted_answer.poster_id = poster_id;
-        ctx.accounts.publisher_decrypted_answer.answer = answer;
-        ctx.accounts.publisher_decrypted_answer.hash = hash;
+        ctx.accounts.publisher_decrypted_answer.answer = answer.clone();
+        ctx.accounts.publisher_decrypted_answer.hash = hash.clone();
         emit!(PosterPublishAnswered {
             publisher: ctx.accounts.publisher.key(),
             poster_publisher_decrypted_answer: PosterPublisherDecryptedAnswerInfo {
@@ -250,8 +250,8 @@ pub mod challenge_protocol {
             ChallengeProtocolError::PosterDeadlineNotPassed
         );
         ctx.accounts.answerer_decrypted_answer.poster_id = poster_id;
-        ctx.accounts.answerer_decrypted_answer.answer = answer;
-        ctx.accounts.answerer_decrypted_answer.hash = hash;
+        ctx.accounts.answerer_decrypted_answer.answer = answer.clone();
+        ctx.accounts.answerer_decrypted_answer.hash = hash.clone();
         emit!(AnswererDecryptedAnswerPosted {
             answerer: ctx.accounts.answerer.key(),
             answerer_decrypted_answer: PosterAnswererDecryptedAnswerInfo {
