@@ -111,6 +111,7 @@ pub mod challenge_protocol {
         let cpi_transfer_ctx = CpiContext::new(token_prgram, req);
         token_interface::transfer_checked(cpi_transfer_ctx, bounty_minimum_gain, TOKEN_DEMICAL)?;
 
+        ctx.accounts.data.publisher = ctx.accounts.owner.key();
         ctx.accounts.data.bounty_id = ctx.accounts.vault_global_state.bounty_counter;
         ctx.accounts.vault_global_state.bounty_counter += 1;
         ctx.accounts.data.submission_cost = submission_cost;
@@ -168,6 +169,8 @@ pub mod challenge_protocol {
             TOKEN_DEMICAL,
         )?;
         ctx.accounts.poster_response.time = Clock::get()?.unix_timestamp as u64;
+        ctx.accounts.poster_response.answerer = ctx.accounts.answerer.key();
+        ctx.accounts.vault_global_state.response_counter += 1;
         ctx.accounts.poster_response.poster_id = ctx.accounts.poster_info.bounty_id;
         ctx.accounts.poster_response.answer = Some(answer);
         ctx.accounts.user_balance_info.balance -= ctx.accounts.poster_info.submission_cost;
@@ -184,13 +187,168 @@ pub mod challenge_protocol {
         Ok(())
     }
     pub fn no_submission_poster(ctx: Context<NoSubmissionPoster>, poster_id: u64) -> Result<()> {
-        let poster_info = &ctx.accounts.poster_info;
         require!(
-            Clock::get()?.unix_timestamp as u64 > poster_info.deadline,
+            Clock::get()?.unix_timestamp as u64 > ctx.accounts.poster_info.deadline,
             ChallengeProtocolError::InsufficientAnteTokens
         );
+        require!(
+            u64::checked_add(
+                ctx.accounts.user_balance_info.balance,
+                ctx.accounts.poster_info.bounty_minimum_gain
+            )
+            .is_some(),
+            ChallengeProtocolError::OverflowError
+        );
+        let token_prgram = ctx.accounts.token_program.to_account_info();
+        let req = TransferChecked {
+            from: ctx.accounts.vault_ata.to_account_info(),
+            to: ctx.accounts.poster_publisher_ata.to_account_info(),
+            authority: ctx.accounts.vault_authority.to_account_info(),
+            mint: ctx.accounts.mint.to_account_info(),
+        };
+        let seeds: &[&[&[u8]]] = &[&[b"authority", &[ctx.bumps.vault_authority]]];
+        let cpi_transfer_ctx = CpiContext::new_with_signer(token_prgram, req, seeds);
+        token_interface::transfer_checked(
+            cpi_transfer_ctx,
+            ctx.accounts.poster_info.bounty_minimum_gain,
+            TOKEN_DEMICAL,
+        )?;
+        ctx.accounts.user_balance_info.balance += ctx.accounts.poster_info.bounty_minimum_gain;
         Ok(())
     }
+    pub fn post_poster_solution(
+        ctx: Context<PostPosterSolution>,
+        poster_id: u64,
+        answer: String,
+        hash: String,
+    ) -> Result<()> {
+        require!(
+            Clock::get()?.unix_timestamp as u64 > ctx.accounts.poster_info.deadline,
+            ChallengeProtocolError::PosterDeadlineNotPassed
+        );
+        ctx.accounts.publisher_decrypted_answer.poster_id = poster_id;
+        ctx.accounts.publisher_decrypted_answer.answer = answer;
+        ctx.accounts.publisher_decrypted_answer.hash = hash;
+        emit!(PosterPublishAnswered {
+            publisher: ctx.accounts.publisher.key(),
+            poster_publisher_decrypted_answer: PosterPublisherDecryptedAnswerInfo {
+                poster_id,
+                answer,
+                hash
+            }
+        });
+        Ok(())
+    }
+    pub fn post_answerer_decrypted_answer(
+        ctx: Context<PostAnswererDecryptedAnswer>,
+        poster_id: u64,
+        answer: String,
+        hash: String,
+    ) -> Result<()> {
+        require!(
+            Clock::get()?.unix_timestamp as u64 > ctx.accounts.poster_info.deadline,
+            ChallengeProtocolError::PosterDeadlineNotPassed
+        );
+        ctx.accounts.answerer_decrypted_answer.poster_id = poster_id;
+        ctx.accounts.answerer_decrypted_answer.answer = answer;
+        ctx.accounts.answerer_decrypted_answer.hash = hash;
+        emit!(AnswererDecryptedAnswerPosted {
+            answerer: ctx.accounts.answerer.key(),
+            answerer_decrypted_answer: PosterAnswererDecryptedAnswerInfo {
+                poster_id,
+                answer,
+                hash
+            }
+        });
+        Ok(())
+    }
+}
+#[derive(Accounts)]
+#[instruction(poster_id: u64)]
+pub struct PostAnswererDecryptedAnswer<'info> {
+    #[account(mut)]
+    pub answerer: Signer<'info>,
+    #[account(mut,
+        seeds=[b"poster_response", poster_id.to_le_bytes().as_ref(), answerer.key().as_ref()],
+        bump,
+        has_one = answerer
+    )]
+    pub poster_response: Account<'info, PosterResponse>,
+    #[account(init,
+        space=ANCHOR_DISCRIMINATOR + PosterAnswererDecryptedAnswer::INIT_SPACE,
+        payer=answerer,
+        seeds=[b"poster_answerer_decrypted_answer", poster_id.to_le_bytes().as_ref(), answerer.key().as_ref()],
+        bump)]
+    pub answerer_decrypted_answer: Account<'info, PosterAnswererDecryptedAnswer>,
+    #[account(mut,
+        seeds=[b"poster", poster_id.to_le_bytes().as_ref()],
+        bump,
+    )]
+    pub poster_info: Account<'info, Poster>,
+    pub system_program: Program<'info, System>,
+}
+#[derive(Accounts)]
+#[instruction(poster_id: u64)]
+pub struct PostPosterSolution<'info> {
+    #[account(mut)]
+    pub publisher: Signer<'info>,
+    #[account(mut,
+        seeds=[b"poster", poster_id.to_le_bytes().as_ref()],
+        bump,
+        has_one = publisher
+    )]
+    pub poster_info: Account<'info, Poster>,
+    #[account(init,
+        space=ANCHOR_DISCRIMINATOR + PosterPublisherDecryptedAnswer::INIT_SPACE,
+        payer=publisher,
+        seeds=[b"poster_decrypted_answer", poster_id.to_le_bytes().as_ref(), publisher.key().as_ref()],
+        bump)]
+    pub publisher_decrypted_answer: Account<'info, PosterPublisherDecryptedAnswer>,
+    pub system_program: Program<'info, System>,
+}
+#[derive(Accounts)]
+#[instruction(poster_id: u64)]
+pub struct NoSubmissionPoster<'info> {
+    #[account(mut)]
+    pub admin: Signer<'info>,
+    #[account(mut,
+    seeds=[b"config"],
+    bump,
+    has_one = admin
+    )]
+    pub config: Account<'info, Config>,
+    #[account(mut,
+    seeds=[b"vault_authority"],
+    bump)]
+    ///CHECK: vault_authority is safe
+    pub vault_authority: UncheckedAccount<'info>,
+    #[account(mut,
+        seeds=[b"Ante"],
+        bump
+    )]
+    pub mint: InterfaceAccount<'info, Mint>,
+    #[account(mut,
+    associated_token::mint=mint,
+    associated_token::authority=vault_authority,
+    )]
+    pub vault_ata: InterfaceAccount<'info, TokenAccount>,
+    #[account(mut,
+    seeds=[b"poster", poster_id.to_le_bytes().as_ref()],
+    bump)]
+    pub poster_info: Account<'info, Poster>,
+    ///CHECK: poster_publisher is safe since we are only reading data from them
+    pub poster_publisher: UncheckedAccount<'info>,
+    #[account(mut,
+    seeds=[b"user_balance_info", poster_publisher.key().as_ref()],
+    bump)]
+    pub user_balance_info: Account<'info, UserBalance>,
+    #[account(mut,
+    associated_token::mint=mint,
+    associated_token::authority=poster_publisher)]
+    pub poster_publisher_ata: InterfaceAccount<'info, TokenAccount>,
+    pub token_program: Interface<'info, TokenInterface>,
+    pub system_program: Program<'info, System>,
+    pub associated_token_program: Program<'info, AssociatedToken>,
 }
 
 //TODO: add a constrant with instruction with poster_minimum_submission so user doens't waste their sol
@@ -226,7 +384,7 @@ pub struct AnswerPoster<'info> {
     )]
     pub user_balance_info: Account<'info, UserBalance>,
     #[account(mut,
-        seeds=[b"poster", poster_id.to_le_bytes().as_ref(), poster_publisher.key().as_ref()],
+        seeds=[b"poster", poster_id.to_le_bytes().as_ref()],
         bump,
     )]
     pub poster_info: Account<'info, Poster>,
@@ -238,6 +396,11 @@ pub struct AnswerPoster<'info> {
         seeds=[b"poster_response", poster_id.to_le_bytes().as_ref(), answerer.key().as_ref()],
         bump)]
     pub poster_response: Account<'info, PosterResponse>,
+
+    #[account(mut,
+    seeds=[b"vault_global_state"],
+    bump)]
+    pub vault_global_state: Account<'info, VaultGlobalState>,
     pub token_program: Interface<'info, TokenInterface>,
     pub system_program: Program<'info, System>,
     pub associated_token_program: Program<'info, AssociatedToken>,
@@ -331,7 +494,7 @@ pub struct UploadNewPoster<'info> {
     #[account(init,
         space=Poster::INIT_SPACE + ANCHOR_DISCRIMINATOR,
     payer=owner,
-    seeds=[b"poster",vault_global_state.bounty_counter.to_le_bytes().as_ref(), owner.key().as_ref()],
+    seeds=[b"poster",vault_global_state.bounty_counter.to_le_bytes().as_ref()],
     constraint = user_balance_info.balance >= bounty_minimum_gain,
     bump)]
     pub data: Account<'info, Poster>,
@@ -447,6 +610,7 @@ pub enum BountyTopic {
 #[derive(InitSpace)]
 #[account]
 pub struct Poster {
+    pub publisher: Pubkey,
     bounty_id: u64,
     bounty_type: BountyType,
     bounty_topic: BountyTopic,
@@ -471,8 +635,10 @@ pub struct PosterInfo {
 #[account]
 #[derive(InitSpace)]
 pub struct PosterResponse {
+    answerer: Pubkey,
     time: u64,
     poster_id: u64,
+    answer_id: u64,
     answer: Option<[u8; 33]>,
 }
 #[derive(AnchorDeserialize, AnchorSerialize)]
@@ -487,7 +653,36 @@ pub struct PosterWinner {
     pub poster_id: u64,
     pub winner_id: Pubkey,
 }
-
+#[account]
+#[derive(InitSpace)]
+pub struct PosterPublisherDecryptedAnswer {
+    pub poster_id: u64,
+    #[max_len(64)]
+    pub answer: String,
+    #[max_len(32)]
+    pub hash: String,
+}
+#[account]
+#[derive(InitSpace)]
+pub struct PosterAnswererDecryptedAnswer {
+    pub poster_id: u64,
+    #[max_len(64)]
+    pub answer: String,
+    #[max_len(32)]
+    pub hash: String,
+}
+#[derive(AnchorDeserialize, AnchorSerialize)]
+pub struct PosterPublisherDecryptedAnswerInfo {
+    pub poster_id: u64,
+    pub answer: String,
+    pub hash: String,
+}
+#[derive(AnchorDeserialize, AnchorSerialize)]
+pub struct PosterAnswererDecryptedAnswerInfo {
+    pub poster_id: u64,
+    pub answer: String,
+    pub hash: String,
+}
 #[error_code]
 pub enum ChallengeProtocolError {
     #[msg("incorrect token request amount")]
@@ -498,6 +693,8 @@ pub enum ChallengeProtocolError {
     PosterDeadlineNotPassed,
     #[msg("poster deadline has passed, no submission allowed")]
     PosterDeadlinePassed,
+    #[msg("overflow error")]
+    OverflowError,
 }
 
 #[account]
@@ -515,6 +712,7 @@ pub struct UserBalance {
 #[account]
 pub struct VaultGlobalState {
     pub bounty_counter: u64,
+    pub response_counter: u64,
 }
 #[event]
 pub struct PosterCreated {
@@ -525,4 +723,14 @@ pub struct PosterCreated {
 pub struct PosterAnswered {
     pub answerer: Pubkey,
     pub poster_response: PosterResponseInfo,
+}
+#[event]
+pub struct PosterPublishAnswered {
+    pub publisher: Pubkey,
+    pub poster_publisher_decrypted_answer: PosterPublisherDecryptedAnswerInfo,
+}
+#[event]
+pub struct AnswererDecryptedAnswerPosted {
+    pub answerer: Pubkey,
+    pub answerer_decrypted_answer: PosterAnswererDecryptedAnswerInfo,
 }
