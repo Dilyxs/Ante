@@ -366,12 +366,13 @@ describe("flows: post winner, vote, refund", () => {
       : 0;
     const vaultAfter = await getAccount(provider.connection, vaultAta);
 
-    // the program transfers tokens directly to the winner ATA. Assert the ATA
-    // increased by the expected bountyMinimumGain.
+    // the program transfers tokens directly to the winner ATA and also updates
+    // user_balance_info. Assert both increased by the expected bountyMinimumGain.
     assert.equal(
       Number(winnerAtaAfter.amount) - Number(winnerAtaBefore.amount),
       bountyMinimumGain
     );
+    assert.equal(winnerUserBalAfter - winnerUserBalBefore, bountyMinimumGain);
     // vault should have decreased by bountyMinimumGain
     assert.equal(
       Number(vaultBefore.amount) - Number(vaultAfter.amount),
@@ -598,7 +599,7 @@ describe("flows: post winner, vote, refund", () => {
     assert.isTrue(failed, "duplicate vote should fail");
   });
 
-  it("refund_answerer_where_poster_didnt_post_solution: admin refunds to publisher ATA (happy)", async () => {
+  it("refund_answerer_where_poster_didnt_post_solution: admin refunds to answerer ATA (happy)", async () => {
     const wallet = provider.wallet.publicKey;
 
     // create fresh poster so publisher didn't post solution
@@ -756,15 +757,15 @@ describe("flows: post winner, vote, refund", () => {
       .signers([answerer])
       .rpc();
 
-    // record pre balances
-    const posterPublisherAta = ownerAta; // publisher is wallet
+    // record pre balances (refund goes to answerer)
+    const posterAnswererAta = answererAta;
     const vaultBefore = await getAccount(provider.connection, vaultAta);
-    const publisherAtaBefore = await getAccount(
+    const answererAtaBefore = await getAccount(
       provider.connection,
-      posterPublisherAta
+      posterAnswererAta
     );
 
-    // admin triggers refund of 1 token to publisher ATA
+    // admin triggers refund of submission_cost to answerer ATA
     await program.methods
       .refundAnswererWherePosterDidntPostSolution(new anchor.BN(counterBefore))
       .accounts({
@@ -773,7 +774,7 @@ describe("flows: post winner, vote, refund", () => {
         vaultAuthority: vaultAuthorityPda,
         mint: anteMintPda,
         vaultAta,
-        posterPublisher: wallet,
+        posterAnswerer: answerer.publicKey,
         posterResponse: anchor.web3.PublicKey.findProgramAddressSync(
           [
             Buffer.from("poster_response"),
@@ -782,13 +783,9 @@ describe("flows: post winner, vote, refund", () => {
           ],
           program.programId
         )[0],
-        userBalanceInfo: anchor.web3.PublicKey.findProgramAddressSync(
-          [Buffer.from("user_balance_info"), wallet.toBuffer()],
-          program.programId
-        )[0],
+        userBalanceInfo: answererUserBalPda,
         posterInfo: posterPda,
-        posterPublisherAta: posterPublisherAta,
-        posterAnswerer: answerer.publicKey,
+        posterAnswererAta: posterAnswererAta,
         tokenProgram: TOKEN_PROGRAM,
         systemProgram: anchor.web3.SystemProgram.programId,
         associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM,
@@ -796,14 +793,14 @@ describe("flows: post winner, vote, refund", () => {
       .rpc();
 
     const vaultAfter = await getAccount(provider.connection, vaultAta);
-    const publisherAtaAfter = await getAccount(
+    const answererAtaAfter = await getAccount(
       provider.connection,
-      posterPublisherAta
+      posterAnswererAta
     );
 
     assert.equal(Number(vaultBefore.amount) - Number(vaultAfter.amount), 1);
     assert.equal(
-      Number(publisherAtaAfter.amount) - Number(publisherAtaBefore.amount),
+      Number(answererAtaAfter.amount) - Number(answererAtaBefore.amount),
       1
     );
   });

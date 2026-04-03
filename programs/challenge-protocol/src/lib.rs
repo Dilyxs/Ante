@@ -284,7 +284,7 @@ pub mod challenge_protocol {
         let token_prgram = ctx.accounts.token_program.to_account_info();
         let req = TransferChecked {
             from: ctx.accounts.vault_ata.to_account_info(),
-            to: ctx.accounts.poster_publisher_ata.to_account_info(),
+            to: ctx.accounts.poster_answerer_ata.to_account_info(),
             authority: ctx.accounts.vault_authority.to_account_info(),
             mint: ctx.accounts.mint.to_account_info(),
         };
@@ -331,8 +331,13 @@ pub mod challenge_protocol {
             .ok_or(ChallengeProtocolError::OverflowError)?;
 
         token_interface::transfer_checked(cpi_transfer_ctx, winner_share, TOKEN_DEMICAL)?;
-        // NOTE: tokens are transferred directly to the winner's ATA above. Do not
-        // also credit the on-chain user_balance_info to avoid double-counting.
+        // Keep winner's internal balance tracking in sync with transfer.
+        ctx.accounts.user_balance_info.balance = ctx
+            .accounts
+            .user_balance_info
+            .balance
+            .checked_add(winner_share)
+            .ok_or(ChallengeProtocolError::OverflowError)?;
         ctx.accounts.post_winner.poster_id = poster_id;
         ctx.accounts.post_winner.winner_id = winner;
         emit!(PosterWinnerPostedEvent { poster_id, winner });
@@ -365,9 +370,9 @@ pub struct VotingWinner<'info> {
     bump)]
     pub poster_info: Account<'info, Poster>,
     #[account(mut,
-    seeds=[b"poster_decrypted_answer", poster_id.to_le_bytes().as_ref(), voter.key().as_ref()],
+    seeds=[b"poster_answerer_decrypted_answer", poster_id.to_le_bytes().as_ref(), voter.key().as_ref()],
     bump)]
-    pub poster_decrypted_response: Account<'info, PosterPublisherDecryptedAnswer>,
+    pub poster_decrypted_response: Account<'info, PosterAnswererDecryptedAnswer>,
     #[account(init,
         payer=voter,
         space=ANCHOR_DISCRIMINATOR + VoteForWinner::INIT_SPACE,
@@ -456,24 +461,25 @@ pub struct RefundAnswererWherePosterDidntPostSolution<'info> {
     associated_token::authority=vault_authority,
     )]
     pub vault_ata: InterfaceAccount<'info, TokenAccount>,
-    ///CHECK: poster_publisher is safe since we are only sending tokens to them
-    pub poster_publisher: UncheckedAccount<'info>,
-    ///CHECK: poster_answerer is safe since we are only reading their pubkey for checks
+    ///CHECK: poster_answerer is safe since we are only reading their pubkey for PDA checks
     pub poster_answerer: UncheckedAccount<'info>,
-    #[account(mut)]
+    #[account(mut,
+    seeds=[b"poster_response", poster_id.to_le_bytes().as_ref(), poster_answerer.key().as_ref()],
+    bump)]
     pub poster_response: Account<'info, PosterResponse>,
     #[account(mut,
-    seeds=[b"user_balance_info", poster_publisher.key().as_ref()],
+    seeds=[b"user_balance_info", poster_answerer.key().as_ref()],
         bump)]
     pub user_balance_info: Account<'info, UserBalance>,
-    #[account(mut)]
+    #[account(mut,
+    seeds=[b"poster", poster_id.to_le_bytes().as_ref()],
+    bump)]
     pub poster_info: Account<'info, Poster>,
     #[account(mut,
     associated_token::mint=mint,
-    // tokens refunded in this flow go to the poster publisher's ATA
-    associated_token::authority=poster_publisher,
+    associated_token::authority=poster_answerer,
     )]
-    pub poster_publisher_ata: InterfaceAccount<'info, TokenAccount>,
+    pub poster_answerer_ata: InterfaceAccount<'info, TokenAccount>,
     pub token_program: Interface<'info, TokenInterface>,
     pub system_program: Program<'info, System>,
     pub associated_token_program: Program<'info, AssociatedToken>,
