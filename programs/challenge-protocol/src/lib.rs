@@ -153,7 +153,7 @@ pub mod challenge_protocol {
         );
         let current_time = Clock::get()?.unix_timestamp as u64;
         require!(
-            ctx.accounts.poster_info.deadline >= current_time,
+            current_time >= ctx.accounts.poster_info.deadline,
             ChallengeProtocolError::PosterDeadlineNotPassed
         );
         let token_prgram = ctx.accounts.token_program.to_account_info();
