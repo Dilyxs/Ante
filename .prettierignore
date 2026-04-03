@@ -1,7 +1,40 @@
 .anchor
 .DS_Store
-target
+# Node build output
 node_modules
 dist
 build
+dist-ssr
+
+# Rust build output / generated artifacts
+target
+target/**/deploy
+target/**/deploy/*
+
+# Anchor / Solana
+.anchor
 test-ledger
+
+# Editor / system
+.vscode
+.idea
+
+# Coverage / test artifacts
+coverage
+coverage/*
+
+# Minified / binary / generated files
+*.min.js
+*.min.css
+*.bundle.js
+*.map
+*.so
+*.wasm
+*.d
+
+# Logs
+*.log
+
+# Secrets / keys
+*.pem
+*.key
