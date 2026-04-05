@@ -12,7 +12,7 @@ challenge_protocol = "FraezYKQ1zKbysJJK7jYGr8J2ZVt5Cyz3GrQ3WSDLQyS"
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "localnet"
+cluster = "devnet"
 wallet = "~/.config/solana/id.json"
 
 [scripts]

@@ -348,6 +348,10 @@ pub mod challenge_protocol {
         poster_id: u64,
         winner: Pubkey,
     ) -> Result<()> {
+        require!(
+            winner != ctx.accounts.voter.key.clone(),
+            ChallengeProtocolError::UserVotedForThemselves
+        );
         ctx.accounts.vote_for_winner.poster_id = poster_id;
         ctx.accounts.vote_for_winner.voter = ctx.accounts.voter.key();
         ctx.accounts.vote_for_winner.winner_vote = winner;
@@ -939,6 +943,8 @@ pub enum ChallengeProtocolError {
     OverflowError,
     #[msg("1 week deadline has not passed yet")]
     OneWeekDeadlineNotPassed,
+    #[msg("user cannot vote for themselves")]
+    UserVotedForThemselves,
 }
 
 #[account]
