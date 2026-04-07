@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Ante | Challenge Detail</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-tertiary": "#ffffff",
+                    "secondary-container": "#66affe",
+                    "surface": "#f8f9fa",
+                    "surface-container-highest": "#e1e3e4",
+                    "secondary": "#0061a5",
+                    "on-secondary": "#ffffff",
+                    "background": "#f8f9fa",
+                    "on-tertiary-fixed": "#111d22",
+                    "outline-variant": "#c6c6cc",
+                    "error": "#ba1a1a",
+                    "on-error-container": "#93000a",
+                    "primary-fixed-dim": "#c1c6d7",
+                    "on-secondary-fixed-variant": "#00497e",
+                    "surface-container-low": "#f3f4f5",
+                    "tertiary": "#010a0f",
+                    "inverse-on-surface": "#f0f1f2",
+                    "primary": "#030813",
+                    "secondary-fixed-dim": "#9fcaff",
+                    "on-surface": "#191c1d",
+                    "on-background": "#191c1d",
+                    "inverse-primary": "#c1c6d7",
+                    "on-primary": "#ffffff",
+                    "on-tertiary-fixed-variant": "#3c494e",
+                    "on-primary-container": "#828796",
+                    "on-tertiary-container": "#7d8a90",
+                    "surface-container-lowest": "#ffffff",
+                    "tertiary-fixed": "#d8e4eb",
+                    "surface-container-high": "#e7e8e9",
+                    "surface-container": "#edeeef",
+                    "on-surface-variant": "#45474c",
+                    "surface-variant": "#e1e3e4",
+                    "error-container": "#ffdad6",
+                    "on-secondary-fixed": "#001d37",
+                    "primary-fixed": "#dde2f3",
+                    "secondary-fixed": "#d2e4ff",
+                    "on-secondary-container": "#004172",
+                    "tertiary-fixed-dim": "#bcc8cf",
+                    "surface-tint": "#585e6c",
+                    "on-primary-fixed": "#161c27",
+                    "surface-dim": "#d9dadb",
+                    "tertiary-container": "#162227",
+                    "primary-container": "#1a202c",
+                    "surface-bright": "#f8f9fa",
+                    "inverse-surface": "#2e3132",
+                    "on-primary-fixed-variant": "#414754",
+                    "on-error": "#ffffff",
+                    "outline": "#76777c"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "1rem",
+                    "xl": "1.25rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Manrope"],
+                    "body": ["Inter"],
+                    "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; color: #191c1d; }
+        h1, h2, h3, .font-headline { font-family: 'Manrope', sans-serif; }
+        .glass-nav { background: rgba(248, 249, 250, 0.8); backdrop-filter: blur(20px); }
+        .ambient-shadow { box-shadow: 0 20px 60px -10px rgba(25, 28, 29, 0.04); }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface">
+<!-- Top Navigation Bar -->
+<nav class="fixed top-0 w-full z-50 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-xl shadow-sm shadow-slate-200/20">
+<div class="flex justify-between items-center w-full px-6 py-4 max-w-screen-2xl mx-auto">
+<div class="text-2xl font-black text-slate-900 dark:text-slate-50 tracking-tighter">Ante</div>
+<div class="hidden md:flex items-center space-x-8">
+<a class="text-slate-900 dark:text-white font-extrabold border-b-2 border-slate-900 dark:border-white pb-1" href="#">Explore</a>
+<a class="text-slate-500 dark:text-slate-400 font-medium hover:text-slate-900 dark:hover:text-white transition-colors duration-300" href="#">How it Works</a>
+<a class="text-slate-500 dark:text-slate-400 font-medium hover:text-slate-900 dark:hover:text-white transition-colors duration-300" href="#">Leaderboard</a>
+</div>
+<button class="bg-primary text-on-primary font-headline font-bold px-6 py-2 rounded-lg scale-95 active:opacity-80 transition-transform">
+                Connect Wallet
+            </button>
+</div>
+</nav>
+<main class="pt-28 pb-20 px-6 max-w-screen-2xl mx-auto">
+<!-- Header Section -->
+<header class="mb-12">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+<div>
+<div class="flex items-center gap-3 mb-4">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-secondary-fixed text-on-secondary-fixed tracking-wider uppercase">
+<span class="material-symbols-outlined text-[14px] mr-1" style="font-variation-settings: 'FILL' 1;">security</span>
+                            Active: Commit Phase
+                        </span>
+<span class="text-on-surface-variant text-sm font-medium">Bounty: 4.5 ETH</span>
+</div>
+<h1 class="text-4xl md:text-5xl font-extrabold tracking-tight text-primary">Zero-Knowledge Proof Optimization</h1>
+<p class="mt-4 text-on-surface-variant max-w-2xl leading-relaxed">
+                        Optimize the recursive verification circuit for the monolith architecture. Submit a hashed commitment of your solution to secure your place in the revelation phase.
+                    </p>
+</div>
+<div class="flex items-center gap-4 text-sm font-medium text-on-surface-variant bg-surface-container px-6 py-3 rounded-xl">
+<span class="material-symbols-outlined text-secondary">schedule</span>
+                    Ends in: <span class="text-primary font-bold">14:22:09</span>
+</div>
+</div>
+</header>
+<!-- Main Grid Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+<!-- Left Column: Commitment Form -->
+<div class="lg:col-span-7 space-y-8">
+<section class="bg-surface-container-lowest rounded-xl p-8 ambient-shadow">
+<h2 class="text-xl font-bold mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">edit_note</span>
+                        Commit Solution
+                    </h2>
+<div class="space-y-6">
+<div>
+<label class="block text-sm font-semibold text-on-surface mb-2">Solution Logic (Private)</label>
+<textarea class="w-full bg-surface-container-highest border-none rounded-lg p-4 text-sm font-body focus:ring-0 focus:bg-surface-container-lowest transition-colors min-h-[160px]" placeholder="Describe your optimization logic here. This remains private until the Reveal Phase..."></textarea>
+</div>
+<div>
+<label class="block text-sm font-semibold text-on-surface mb-2">SHA-256 Hash Commitment</label>
+<div class="relative">
+<input class="w-full bg-surface-container border-none rounded-lg pl-4 pr-12 py-3 text-xs font-mono text-on-surface-variant" readonly="" type="text" value="e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"/>
+<button class="absolute right-3 top-1/2 -translate-y-1/2 text-secondary hover:opacity-70">
+<span class="material-symbols-outlined">content_copy</span>
+</button>
+</div>
+<p class="mt-2 text-[11px] text-on-surface-variant italic">The hash is automatically generated from your solution content to ensure integrity.</p>
+</div>
+<div class="pt-4">
+<button class="w-full bg-primary text-on-primary py-4 rounded-lg font-headline font-extrabold text-lg flex items-center justify-center gap-3 shadow-lg shadow-primary/10 hover:bg-primary-container transition-all">
+                                Execute Commit Transaction
+                                <span class="material-symbols-outlined">bolt</span>
+</button>
+</div>
+</div>
+</section>
+<section class="bg-surface-container-low rounded-xl p-8">
+<h3 class="text-sm font-bold text-on-surface-variant uppercase tracking-widest mb-4">Submission Brief</h3>
+<div class="prose prose-sm text-on-surface-variant leading-relaxed">
+<p>Participants must commit a SHA-256 hash of their optimized assembly code. Any deviation in the reveal phase will result in slashing of the staked collateral. Ensure your environment matches the <strong>Arctic-7 Node</strong> specifications.</p>
+</div>
+</section>
+</div>
+<!-- Right Column: Live Activity Feed -->
+<div class="lg:col-span-5">
+<div class="bg-surface-container-lowest rounded-xl p-6 ambient-shadow h-full flex flex-col">
+<div class="flex items-center justify-between mb-6">
+<h2 class="text-lg font-bold flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">sensors</span>
+                            Live Activity
+                        </h2>
+<span class="flex items-center gap-2 text-[10px] font-bold text-secondary-fixed-dim uppercase tracking-tighter">
+<span class="w-2 h-2 rounded-full bg-secondary-container animate-pulse"></span>
+                            Websocket Connected
+                        </span>
+</div>
+<div class="flex-1 space-y-4 overflow-y-auto pr-2 custom-scrollbar">
+<!-- Activity Item -->
+<div class="p-4 bg-surface rounded-lg transition-all hover:bg-surface-container-low group">
+<div class="flex items-start gap-4">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined">person</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start">
+<span class="text-sm font-bold text-primary">0x71C...3921</span>
+<span class="text-[10px] text-on-surface-variant">2m ago</span>
+</div>
+<p class="text-xs text-on-surface-variant mt-1">Committed hash for challenge optimization</p>
+<div class="mt-2 flex items-center gap-2">
+<span class="px-2 py-0.5 rounded bg-surface-container text-[10px] font-mono text-on-surface-variant">tx: 0xa12...ef3b</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Activity Item -->
+<div class="p-4 bg-surface rounded-lg transition-all hover:bg-surface-container-low group">
+<div class="flex items-start gap-4">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined">person</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start">
+<span class="text-sm font-bold text-primary">vitalik.eth</span>
+<span class="text-[10px] text-on-surface-variant">14m ago</span>
+</div>
+<p class="text-xs text-on-surface-variant mt-1">Staked 1.2 ETH for participation</p>
+<div class="mt-2 flex items-center gap-2">
+<span class="px-2 py-0.5 rounded bg-surface-container text-[10px] font-mono text-on-surface-variant">tx: 0x9b1...44ac</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Activity Item -->
+<div class="p-4 bg-surface rounded-lg transition-all hover:bg-surface-container-low group">
+<div class="flex items-start gap-4">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined">person</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start">
+<span class="text-sm font-bold text-primary">0x482...a812</span>
+<span class="text-[10px] text-on-surface-variant">31m ago</span>
+</div>
+<p class="text-xs text-on-surface-variant mt-1">Committed hash for challenge optimization</p>
+<div class="mt-2 flex items-center gap-2">
+<span class="px-2 py-0.5 rounded bg-surface-container text-[10px] font-mono text-on-surface-variant">tx: 0xcc2...110e</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Activity Item -->
+<div class="p-4 bg-surface rounded-lg opacity-60">
+<div class="flex items-start gap-4">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined">person</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start">
+<span class="text-sm font-bold text-primary">0x112...dd12</span>
+<span class="text-[10px] text-on-surface-variant">1h ago</span>
+</div>
+<p class="text-xs text-on-surface-variant mt-1">Staked 1.2 ETH for participation</p>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-6 pt-6 border-t border-surface-container flex justify-between items-center text-xs">
+<span class="text-on-surface-variant">Current Participants</span>
+<span class="font-bold text-primary">24 Active</span>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="w-full py-12 bg-slate-100 dark:bg-slate-900 mt-20">
+<div class="flex flex-col md:flex-row justify-between items-center px-8 max-w-7xl mx-auto">
+<p class="font-inter text-sm tracking-wide text-slate-600 dark:text-slate-400">© 2024 Ante. Built on the Monolith.</p>
+<div class="flex gap-8 mt-6 md:mt-0">
+<a class="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white underline-offset-4 hover:underline transition-opacity" href="#">Docs</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white underline-offset-4 hover:underline transition-opacity" href="#">Discord</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white underline-offset-4 hover:underline transition-opacity" href="#">Status</a>
+</div>
+</div>
+</footer>
+<style>
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #e1e3e4;
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #bcc8cf;
+        }
+    </style>
+</body></html>

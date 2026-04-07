@@ -1,0 +1,247 @@
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "secondary-container": "#66affe",
+            "on-tertiary": "#ffffff",
+            "surface": "#f8f9fa",
+            "on-tertiary-fixed-variant": "#3c494e",
+            "on-primary-fixed-variant": "#414754",
+            "outline": "#76777c",
+            "surface-container-highest": "#e1e3e4",
+            "inverse-on-surface": "#f0f1f2",
+            "on-secondary-fixed-variant": "#00497e",
+            "surface-container-lowest": "#ffffff",
+            "primary-fixed": "#dde2f3",
+            "on-primary-fixed": "#161c27",
+            "inverse-primary": "#c1c6d7",
+            "on-tertiary-container": "#7d8a90",
+            "surface-variant": "#e1e3e4",
+            "inverse-surface": "#2e3132",
+            "background": "#f8f9fa",
+            "surface-dim": "#d9dadb",
+            "outline-variant": "#c6c6cc",
+            "surface-bright": "#f8f9fa",
+            "tertiary-container": "#162227",
+            "error": "#ba1a1a",
+            "secondary-fixed-dim": "#9fcaff",
+            "on-error-container": "#93000a",
+            "on-error": "#ffffff",
+            "on-primary": "#ffffff",
+            "on-tertiary-fixed": "#111d22",
+            "on-surface-variant": "#45474c",
+            "on-surface": "#191c1d",
+            "primary-fixed-dim": "#c1c6d7",
+            "on-secondary-fixed": "#001d37",
+            "surface-container-low": "#f3f4f5",
+            "primary": "#030813",
+            "on-secondary": "#ffffff",
+            "on-background": "#191c1d",
+            "tertiary-fixed": "#d8e4eb",
+            "surface-container-high": "#e7e8e9",
+            "error-container": "#ffdad6",
+            "secondary-fixed": "#d2e4ff",
+            "tertiary-fixed-dim": "#bcc8cf",
+            "primary-container": "#1a202c",
+            "tertiary": "#010a0f",
+            "surface-tint": "#585e6c",
+            "on-secondary-container": "#004172",
+            "secondary": "#0061a5",
+            "on-primary-container": "#828796",
+            "surface-container": "#edeeef"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "fontFamily": {
+            "headline": ["Manrope"],
+            "body": ["Inter"],
+            "label": ["Inter"]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    body {
+      background-color: #f8f9fa;
+      font-family: 'Inter', sans-serif;
+    }
+    h1, h2, h3 {
+      font-family: 'Manrope', sans-serif;
+    }
+    .arctic-blur {
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+  </style>
+</head>
+<body class="text-on-surface">
+<!-- TopNavBar (App Variant) -->
+<nav class="fixed top-0 w-full z-50 flex justify-between items-center px-6 py-3 bg-[#ffffff]/80 backdrop-blur-xl shadow-[0_20px_60px_rgba(25,28,29,0.04)]">
+<div class="text-xl font-black tracking-tight text-primary">Ante</div>
+<div class="hidden md:flex items-center space-x-8">
+<a class="text-on-surface-variant font-medium hover:bg-surface-container-low px-3 py-1 rounded-lg transition-opacity opacity-80 hover:opacity-100" href="#">Feed</a>
+<a class="text-on-surface-variant font-medium hover:bg-surface-container-low px-3 py-1 rounded-lg transition-opacity opacity-80 hover:opacity-100" href="#">Create Bounty</a>
+<a class="text-primary font-semibold border-b-2 border-primary pb-0.5" href="#">My Dashboard</a>
+</div>
+<div class="flex items-center space-x-4">
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors" data-icon="notifications">notifications</button>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors" data-icon="account_balance_wallet">account_balance_wallet</button>
+<div class="w-8 h-8 rounded-full overflow-hidden bg-surface-container-highest">
+<img alt="User Wallet Avatar" data-alt="abstract geometric pattern in shades of blue and silver representing a crypto wallet profile avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXM8LFKLdffv5ES9Ah3jVbgxUJyZerxonWV-jX5s3eyF2zrycsLBME7TNuWz07OkTOOyhIWMcHsByrWr3pVEXDdtqBoaK7GrDCk8jQiesiCYRVBB7nf4zDV1pXZbyODIsMv0xPNXLxGycKgSe1ZM4_ILKAg7GeHy_ipEie164ErF9_kQEYQG2ALOsrwtM2v6Fxfr81lKphyVLn4GXTg4lHq1Ibfp9ZbLPG28CDecTg7PLgFQB3-JUbDkzNWI4Y92BsP64GRSHlcUjr"/>
+</div>
+</div>
+</nav>
+<main class="pt-24 pb-20 px-6 max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
+<!-- Left Column: Commit Form -->
+<div class="lg:col-span-8 space-y-8">
+<header class="space-y-2">
+<div class="flex items-center gap-2 text-secondary font-semibold tracking-wide uppercase text-xs">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+          Commit Phase Active
+        </div>
+<h1 class="text-4xl font-extrabold tracking-tight text-primary">Cryptographic Proof Submission</h1>
+<p class="text-on-surface-variant max-w-2xl">Secure your solution logic by committing its hash to the ledger. This process ensures your intellectual property is timestamped before reveal.</p>
+</header>
+<!-- Main Interaction Area (Asymmetric Layout) -->
+<div class="bg-surface-container-lowest p-8 rounded-xl shadow-[0_20px_40px_rgba(25,28,29,0.02)] space-y-8">
+<!-- Solution Logic Area -->
+<div class="space-y-4">
+<div class="flex justify-between items-end">
+<label class="block text-sm font-bold text-primary">Solution Logic (Private)</label>
+<span class="text-xs text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]" data-icon="lock" style="font-variation-settings: 'FILL' 1;">lock</span>
+              Local encryption only
+            </span>
+</div>
+<div class="relative group">
+<textarea class="w-full bg-surface-container-highest border-none rounded-lg p-6 focus:ring-0 focus:bg-white transition-all duration-300 font-mono text-sm resize-none placeholder:text-outline-variant" placeholder="Paste your architecture logic, secret values, or code snippets here..." rows="8"></textarea>
+<div class="absolute inset-0 pointer-events-none rounded-lg group-focus-within:ring-1 ring-outline-variant/30"></div>
+</div>
+</div>
+<!-- Hash Generation / Input -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="space-y-4">
+<label class="block text-sm font-bold text-primary">SHA-256 Hash Commitment</label>
+<div class="relative">
+<input class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3 text-on-primary-fixed-variant font-mono text-xs cursor-default" readonly="" type="text" value="0x7f83b127959f74c4e299b645e003a539..."/>
+<button class="absolute right-2 top-1.5 p-1.5 hover:bg-surface-container-highest rounded-md transition-colors">
+<span class="material-symbols-outlined text-sm" data-icon="content_copy">content_copy</span>
+</button>
+</div>
+<p class="text-[11px] text-on-surface-variant leading-relaxed">
+              This unique fingerprint will be stored on-chain. Do not lose your original Solution Logic, as it is required for the Reveal Phase.
+            </p>
+</div>
+<div class="bg-surface-container-low rounded-lg p-6 flex flex-col justify-center items-center text-center space-y-3">
+<span class="material-symbols-outlined text-secondary text-3xl" data-icon="fingerprint">fingerprint</span>
+<div class="space-y-1">
+<h3 class="text-sm font-bold text-primary">Automated Hashing</h3>
+<p class="text-xs text-on-surface-variant">The system has generated a unique hash from your input above.</p>
+</div>
+</div>
+</div>
+<!-- Execute Button -->
+<div class="pt-4">
+<button class="w-full md:w-auto bg-primary text-on-primary px-8 py-4 rounded-lg font-bold hover:bg-primary-container transition-all flex items-center justify-center gap-3 group">
+<span>Execute Commit Transaction</span>
+<span class="material-symbols-outlined transition-transform group-hover:translate-x-1" data-icon="arrow_forward">arrow_forward</span>
+</button>
+<p class="text-[10px] text-center md:text-left mt-4 text-outline uppercase tracking-widest">Gas Estimate: 0.0024 ETH</p>
+</div>
+</div>
+</div>
+<!-- Right Column: Live Activity Feed -->
+<aside class="lg:col-span-4 space-y-6">
+<div class="bg-surface-container-low rounded-xl p-6 h-fit sticky top-24">
+<div class="flex items-center justify-between mb-8">
+<h2 class="text-lg font-bold text-primary">Live Activity</h2>
+<span class="flex h-2 w-2 relative">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary-container opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-secondary"></span>
+</span>
+</div>
+<div class="space-y-8 relative">
+<!-- Activity Item 1 -->
+<div class="flex gap-4 items-start">
+<div class="w-8 h-8 rounded-full overflow-hidden shrink-0">
+<img alt="Avatar" data-alt="minimalist pixelated blue avatar representing a blockhain user address" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBKsYgPtkIbhnIWnTW9PXYtQrcPKppDHz6WaDz1pcjYrY6bzqzieDNBFdKx1YPoAW5BqjulZx7j4QvVNSzThrcEAw5mYQd-sJHkWE4-Qrp2m8XJ8mzgzTGRwUt0u8cr6xiy2zUYX4HWiFnbmH63rTnHIOcgVGSdYUOGFLt30ZzvZO5XDcPHpeLyzacMpBC7u2tjtkJN9IDyqYjp5XTfXaSSW5PKoJXrcCPNNcYTHNnaoYgx7f35Pj8WnkHWSM6G1ar_Al9oGWfAZ_Sf"/>
+</div>
+<div class="space-y-1">
+<p class="text-xs font-semibold text-primary">0x82...12 committed</p>
+<p class="text-[10px] font-mono text-outline-variant bg-surface-container-highest px-2 py-0.5 rounded inline-block">7f83...a539</p>
+<p class="text-[10px] text-on-surface-variant italic">2 minutes ago</p>
+</div>
+</div>
+<!-- Activity Item 2 -->
+<div class="flex gap-4 items-start">
+<div class="w-8 h-8 rounded-full overflow-hidden shrink-0">
+<img alt="Avatar" data-alt="minimalist pixelated teal avatar representing a blockhain user address" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA9Rf84dkucXp1boGJFDsJvOQeeCyIVrRMPOE-yWK37miOdqowEeL6apxYxw0i-lt7blKWjqEreyFGLlnsHEhFPjRHnzsv3RyNwxwdzXZ9EiT8qQkHUooTyJvreouQzFVel2XInIzfSgR9tibreYha0goOhds25uLtBwruGnH6yNG3HnavUjMc6XSW2tJ6GEHfYJqIpJITF4XK7xt82wQXg-SIhkSITWu333h1TD5hFYxLoEpLBBndNHI3lTs7_-MJzxsXyrS_xHxXA"/>
+</div>
+<div class="space-y-1">
+<p class="text-xs font-semibold text-primary">0x3e...44 committed</p>
+<p class="text-[10px] font-mono text-outline-variant bg-surface-container-highest px-2 py-0.5 rounded inline-block">b291...33e1</p>
+<p class="text-[10px] text-on-surface-variant italic">5 minutes ago</p>
+</div>
+</div>
+<!-- Activity Item 3 -->
+<div class="flex gap-4 items-start opacity-60">
+<div class="w-8 h-8 rounded-full overflow-hidden shrink-0">
+<img alt="Avatar" data-alt="minimalist pixelated violet avatar representing a blockhain user address" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAjUhDom0QDFS3iSapU-tZpQYgi7bN-n2DaPFZT3bfCSWKSAvHwP2S-SEMsSLddQveVEJJvS4v34yuGWRIENTecd92vCp4NixS1MrgZOiHWAI_eabMtemrGj4mNJcwh1CaD7ISYxxQobXvjh4pbcSP7VV-l_PdqVyosli9lNG8Yph8padLKEcDAs23V30_8kBe6ZkcKuUPpFhhy_bMqLgv_q9j891dv8PRifGg32u0wOrM7ve_xFQjCuFgTk0ngUL04KzF1Zu7FV0Zh"/>
+</div>
+<div class="space-y-1">
+<p class="text-xs font-semibold text-primary">0x99...ff committed</p>
+<p class="text-[10px] font-mono text-outline-variant bg-surface-container-highest px-2 py-0.5 rounded inline-block">a122...cc44</p>
+<p class="text-[10px] text-on-surface-variant italic">12 minutes ago</p>
+</div>
+</div>
+<!-- Connecting Line (Visual Detail) -->
+<div class="absolute left-[15px] top-8 bottom-4 w-px bg-outline-variant/20"></div>
+</div>
+<div class="mt-12 pt-8 border-t border-outline-variant/10 text-center">
+<p class="text-[11px] font-medium text-on-surface-variant mb-4">Challenge closes in 14h 22m</p>
+<div class="w-full bg-surface-container-highest h-1 rounded-full overflow-hidden">
+<div class="bg-secondary w-3/4 h-full"></div>
+</div>
+</div>
+</div>
+<!-- Helper Tooltip Card -->
+<div class="bg-primary text-on-primary p-6 rounded-xl space-y-4">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-secondary-container" data-icon="info">info</span>
+<h4 class="font-bold text-sm">Security Tip</h4>
+</div>
+<p class="text-xs text-on-primary-container leading-relaxed">
+          The Commit-Reveal scheme prevents front-running. Your hash is public, but your solution remains secret until you reveal it in the next phase.
+        </p>
+</div>
+</aside>
+</main>
+<!-- Footer -->
+<footer class="w-full py-12 px-8 flex flex-col md:flex-row justify-between items-center gap-6 bg-surface-container-low text-on-surface">
+<div class="text-lg font-bold text-primary">Ante</div>
+<div class="flex flex-wrap justify-center gap-8">
+<a class="text-on-surface-variant hover:text-secondary transition-colors text-[11px] font-medium uppercase tracking-wider" href="#">Privacy Policy</a>
+<a class="text-on-surface-variant hover:text-secondary transition-colors text-[11px] font-medium uppercase tracking-wider" href="#">Terms of Service</a>
+<a class="text-on-surface-variant hover:text-secondary transition-colors text-[11px] font-medium uppercase tracking-wider" href="#">Security</a>
+<a class="text-on-surface-variant hover:text-secondary transition-colors text-[11px] font-medium uppercase tracking-wider" href="#">Docs</a>
+</div>
+<p class="text-[11px] font-medium text-on-surface-variant uppercase tracking-wider">© 2024 Ante Monolith. Built for the Arctic.</p>
+</footer>
+</body></html>

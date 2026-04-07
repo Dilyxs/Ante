@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Challenge Winner - Ante Monolith</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-container": "#66affe",
+                        "on-tertiary": "#ffffff",
+                        "surface": "#f8f9fa",
+                        "on-tertiary-fixed-variant": "#3c494e",
+                        "on-primary-fixed-variant": "#414754",
+                        "outline": "#76777c",
+                        "surface-container-highest": "#e1e3e4",
+                        "inverse-on-surface": "#f0f1f2",
+                        "on-secondary-fixed-variant": "#00497e",
+                        "surface-container-lowest": "#ffffff",
+                        "primary-fixed": "#dde2f3",
+                        "on-primary-fixed": "#161c27",
+                        "inverse-primary": "#c1c6d7",
+                        "on-tertiary-container": "#7d8a90",
+                        "surface-variant": "#e1e3e4",
+                        "inverse-surface": "#2e3132",
+                        "background": "#f8f9fa",
+                        "surface-dim": "#d9dadb",
+                        "outline-variant": "#c6c6cc",
+                        "surface-bright": "#f8f9fa",
+                        "tertiary-container": "#162227",
+                        "error": "#ba1a1a",
+                        "secondary-fixed-dim": "#9fcaff",
+                        "on-error-container": "#93000a",
+                        "on-error": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "on-tertiary-fixed": "#111d22",
+                        "on-surface-variant": "#45474c",
+                        "on-surface": "#191c1d",
+                        "primary-fixed-dim": "#c1c6d7",
+                        "on-secondary-fixed": "#001d37",
+                        "surface-container-low": "#f3f4f5",
+                        "primary": "#030813",
+                        "on-secondary": "#ffffff",
+                        "on-background": "#191c1d",
+                        "tertiary-fixed": "#d8e4eb",
+                        "surface-container-high": "#e7e8e9",
+                        "error-container": "#ffdad6",
+                        "secondary-fixed": "#d2e4ff",
+                        "tertiary-fixed-dim": "#bcc8cf",
+                        "primary-container": "#1a202c",
+                        "tertiary": "#010a0f",
+                        "surface-tint": "#585e6c",
+                        "on-secondary-container": "#004172",
+                        "secondary": "#0061a5",
+                        "on-primary-container": "#828796",
+                        "surface-container": "#edeeef"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3 { font-family: 'Manrope', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .arctic-glass {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface selection:bg-secondary-container/30">
+<!-- TopNavBar (App Type) -->
+<nav class="fixed top-0 w-full z-50 flex justify-between items-center px-6 py-3 bg-[#ffffff]/80 dark:bg-[#1a202c]/80 backdrop-blur-xl shadow-[0_20px_60px_rgba(25,28,29,0.04)]">
+<div class="flex items-center gap-8">
+<span class="text-xl font-black tracking-tight text-[#030813] dark:text-[#ffffff]">Ante</span>
+<div class="hidden md:flex gap-6">
+<a class="text-[#45474c] dark:text-[#c6c6cc] hover:bg-[#f3f4f5] dark:hover:bg-[#030813] px-3 py-1 rounded-lg transition-opacity opacity-80 hover:opacity-100 text-body-md" href="#">Feed</a>
+<a class="text-[#45474c] dark:text-[#c6c6cc] hover:bg-[#f3f4f5] dark:hover:bg-[#030813] px-3 py-1 rounded-lg transition-opacity opacity-80 hover:opacity-100 text-body-md" href="#">Create Bounty</a>
+<a class="text-[#030813] dark:text-[#ffffff] font-semibold border-b-2 border-[#030813] px-3 py-1 transition-opacity text-body-md" href="#">My Dashboard</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-[#030813] dark:text-[#f8f9fa] p-2 hover:bg-surface-container rounded-full transition-colors" data-icon="notifications">notifications</button>
+<button class="material-symbols-outlined text-[#030813] dark:text-[#f8f9fa] p-2 hover:bg-surface-container rounded-full transition-colors" data-icon="account_balance_wallet">account_balance_wallet</button>
+<div class="w-8 h-8 rounded-full overflow-hidden bg-surface-container-high">
+<img alt="User Wallet Avatar" class="w-full h-full object-cover" data-alt="Abstract geometric identicon representing a user's unique cryptographic wallet address in shades of blue and gray" src="https://lh3.googleusercontent.com/aida-public/AB6AXuADAdiwOucgb0e2PWpb4eXT4Og2NU8E_eXsgTq2pZ4h5p5xabhGZntw-LSNAT99Q2DZ2LRKKSaok4ha31n0dLbyh1GCGrXh2Jxk2sNVl2LPB9oNyU9TyRylsX-BCq4ungCFsRIgmiKRfm715_HxoEjVbDeO-4ph9zfjHgWmReGhCGlc_2N07cz4XOKX24TGGdUXS4m_MVXI8bRo4at6waxDgWDokNpqkdHtDO3sR2gKvb2R6NLV6QvUx3jpTy_l0dD-AZ5KAjNbZS7t"/>
+</div>
+</div>
+</nav>
+<main class="pt-32 pb-24 px-6 max-w-6xl mx-auto">
+<!-- Hero Celebration Section -->
+<header class="relative mb-20 text-center md:text-left flex flex-col md:flex-row items-center justify-between gap-12">
+<div class="z-10 max-w-2xl">
+<div class="inline-flex items-center gap-2 px-3 py-1 bg-secondary-fixed text-on-secondary-fixed rounded-full text-xs font-bold tracking-widest uppercase mb-6">
+<span class="material-symbols-outlined text-sm" data-icon="verified_user" style="font-variation-settings: 'FILL' 1;">verified_user</span>
+                    Challenge Concluded
+                </div>
+<h1 class="text-5xl md:text-7xl font-extrabold tracking-tighter text-primary mb-6 leading-tight">
+                    Winner <br/><span class="text-secondary-container">Announced.</span>
+</h1>
+<p class="text-on-surface-variant text-lg max-w-md leading-relaxed">
+                    The Arctic Monolith cryptographical challenge has been solved. The ledger has been updated and rewards are in transit.
+                </p>
+</div>
+<div class="relative w-full max-w-md aspect-square rounded-3xl overflow-hidden shadow-2xl">
+<img class="w-full h-full object-cover" data-alt="Abstract 3D render of a crystalline structure with glowing internal blue light, representing a solved cryptographic puzzle" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCWOlCTvr1egMH1-_V6dXIM16VQQKQ_c4DL5ozSp1pCrGfd7knHfBOagBaOohG04uxMzGmBUuYsxmU6rYnpqHfKWG8SDdgrx-AVo4vOtp2JHvizw7r68HA4gr6TpWr7MJs86amG4mwT1WytjV7U3xtohPeLfOoJOUw4DHgJ_4OVE4Ph6WTT31gH0bIdN5QctRRwXrgNMSQklMPVa5X_Tc7nt38em2MUFKkgGyGblkhObo7lB_XhOcXB-Z1OqqUfGyL04XvbyIOy3a5L"/>
+<div class="absolute inset-0 bg-gradient-to-t from-primary/60 to-transparent"></div>
+<div class="absolute bottom-8 left-8 right-8 arctic-glass p-6 rounded-2xl shadow-lg border-l-4 border-secondary-container">
+<span class="block text-xs uppercase tracking-widest text-on-surface-variant font-bold mb-1">Winning Node</span>
+<code class="text-primary font-mono text-sm break-all font-semibold">0x71C...4e8B9</code>
+</div>
+</div>
+</header>
+<!-- Bento Grid for Details -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+<!-- Payout Card -->
+<div class="md:col-span-4 bg-surface-container-lowest rounded-3xl p-8 shadow-[0_20px_40px_rgba(25,28,29,0.02)] flex flex-col justify-between">
+<div>
+<h3 class="text-on-surface-variant text-sm font-bold uppercase tracking-widest mb-8">Total Reward</h3>
+<div class="space-y-4">
+<div class="flex justify-between items-end border-b border-surface-container-highest pb-4">
+<span class="text-on-surface-variant text-sm">Base Reward</span>
+<span class="text-xl font-bold text-primary">12.50 ETH</span>
+</div>
+<div class="flex justify-between items-end border-b border-surface-container-highest pb-4">
+<span class="text-on-surface-variant text-sm">Arctic Bonus</span>
+<span class="text-xl font-bold text-secondary-container">+ 2.25 ETH</span>
+</div>
+</div>
+</div>
+<div class="mt-12">
+<span class="text-xs text-on-surface-variant uppercase tracking-tighter">Total Payout</span>
+<div class="text-5xl font-black tracking-tighter text-primary mt-1">14.75 ETH</div>
+</div>
+</div>
+<!-- Solution Payload Card -->
+<div class="md:col-span-8 bg-surface-container rounded-3xl p-8 relative overflow-hidden">
+<div class="relative z-10">
+<h3 class="text-on-surface-variant text-sm font-bold uppercase tracking-widest mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-lg" data-icon="terminal">terminal</span>
+                        Decrypted Solution Payload
+                    </h3>
+<div class="bg-primary p-6 rounded-2xl font-mono text-sm leading-relaxed text-secondary-fixed shadow-inner min-h-[200px]">
+<div class="flex items-center gap-2 mb-4 opacity-50 border-b border-white/10 pb-2">
+<span class="w-3 h-3 rounded-full bg-error"></span>
+<span class="w-3 h-3 rounded-full bg-secondary-container"></span>
+<span class="w-3 h-3 rounded-full bg-on-surface-variant"></span>
+<span class="ml-2 text-[10px]">ANTEM_PROTO_V4.SEC</span>
+</div>
+<span class="text-on-tertiary"># Initializing decryption... success.</span><br/>
+<span class="text-on-primary-container">&gt; Validating hash sequence 8829-FF-X9... OK</span><br/>
+<span class="text-white">&gt; Winning Solution String:</span><br/>
+<span class="text-secondary-container font-bold break-all">"the_glacier_moves_slower_than_the_ledger_but_twice_as_resolute_v771"</span><br/>
+<span class="text-on-tertiary">&gt; Execution completed in 14.2ms</span>
+</div>
+</div>
+<!-- Subtle graphic element -->
+<div class="absolute -right-20 -bottom-20 opacity-5 pointer-events-none">
+<span class="material-symbols-outlined text-[300px]" data-icon="lock_open">lock_open</span>
+</div>
+</div>
+<!-- Technical Proof Table (The Ledger Glass) -->
+<div class="md:col-span-12 bg-surface-container-lowest rounded-3xl overflow-hidden shadow-[0_20px_60px_rgba(25,28,29,0.02)]">
+<div class="p-8 border-b border-surface-container-low flex justify-between items-center">
+<h3 class="text-primary font-bold text-xl">Technical Proof</h3>
+<button class="text-secondary text-sm font-semibold hover:underline">View on Explorer</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead>
+<tr class="bg-surface-container-low text-on-surface-variant text-[10px] uppercase tracking-[0.2em] font-black">
+<th class="px-8 py-4">Evidence Type</th>
+<th class="px-8 py-4">Verification Hash</th>
+<th class="px-8 py-4">Timestamp (UTC)</th>
+<th class="px-8 py-4 text-right">Status</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-container-low">
+<tr class="hover:bg-secondary-container/5 transition-colors">
+<td class="px-8 py-6">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center">
+<span class="material-symbols-outlined text-sm" data-icon="fingerprint">fingerprint</span>
+</div>
+<span class="font-semibold text-primary">Submission Sig</span>
+</div>
+</td>
+<td class="px-8 py-6">
+<code class="text-on-surface-variant text-xs font-mono">f8a1...99d2e4ff</code>
+</td>
+<td class="px-8 py-6 text-on-surface-variant text-sm">2024.05.12 14:02:11</td>
+<td class="px-8 py-6 text-right">
+<span class="px-2 py-1 bg-secondary-fixed text-on-secondary-fixed rounded text-[10px] font-bold uppercase">Verified</span>
+</td>
+</tr>
+<tr class="bg-surface-container-lowest hover:bg-secondary-container/5 transition-colors">
+<td class="px-8 py-6">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center">
+<span class="material-symbols-outlined text-sm" data-icon="grid_view">grid_view</span>
+</div>
+<span class="font-semibold text-primary">Block Height</span>
+</div>
+</td>
+<td class="px-8 py-6">
+<code class="text-on-surface-variant text-xs font-mono">19,442,801</code>
+</td>
+<td class="px-8 py-6 text-on-surface-variant text-sm">2024.05.12 14:02:15</td>
+<td class="px-8 py-6 text-right">
+<span class="px-2 py-1 bg-secondary-fixed text-on-secondary-fixed rounded text-[10px] font-bold uppercase">Confirmed</span>
+</td>
+</tr>
+<tr class="hover:bg-secondary-container/5 transition-colors">
+<td class="px-8 py-6">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center">
+<span class="material-symbols-outlined text-sm" data-icon="account_balance">account_balance</span>
+</div>
+<span class="font-semibold text-primary">Treasury Release</span>
+</div>
+</td>
+<td class="px-8 py-6">
+<code class="text-on-surface-variant text-xs font-mono">0x4147...161c27</code>
+</td>
+<td class="px-8 py-6 text-on-surface-variant text-sm">2024.05.12 14:05:00</td>
+<td class="px-8 py-6 text-right">
+<span class="px-2 py-1 bg-primary text-on-primary rounded text-[10px] font-bold uppercase">Processing</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<!-- Call to Action -->
+<footer class="mt-20 flex flex-col items-center">
+<button class="bg-primary text-on-primary px-10 py-4 rounded-xl font-bold tracking-tight hover:bg-primary-container transition-all scale-100 active:scale-95 shadow-xl">
+                Return to Global Feed
+            </button>
+<p class="mt-6 text-on-surface-variant text-sm">New challenges deploy in 14h 22m</p>
+</footer>
+</main>
+<!-- Footer Component -->
+<footer class="w-full py-12 px-8 flex flex-col md:flex-row justify-between items-center gap-6 bg-[#f3f4f5] dark:bg-[#030813]">
+<div class="flex flex-col items-center md:items-start gap-2">
+<span class="text-lg font-bold text-[#030813] dark:text-[#f8f9fa]">Ante</span>
+<p class="text-on-surface-variant text-xs font-label tracking-wider uppercase">© 2024 Ante Monolith. Built for the Arctic.</p>
+</div>
+<div class="flex gap-8">
+<a class="text-[#45474c] dark:text-[#c6c6cc] hover:text-[#66affe] transition-colors text-xs font-label tracking-wider uppercase" href="#">Privacy Policy</a>
+<a class="text-[#45474c] dark:text-[#c6c6cc] hover:text-[#66affe] transition-colors text-xs font-label tracking-wider uppercase" href="#">Terms of Service</a>
+<a class="text-[#45474c] dark:text-[#c6c6cc] hover:text-[#66affe] transition-colors text-xs font-label tracking-wider uppercase" href="#">Security</a>
+<a class="text-[#45474c] dark:text-[#c6c6cc] hover:text-[#66affe] transition-colors text-xs font-label tracking-wider uppercase" href="#">Docs</a>
+</div>
+</footer>
+</body></html>

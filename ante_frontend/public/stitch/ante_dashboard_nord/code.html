@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Ante | Command Center</title>
+<!-- Google Fonts: Manrope & Inter -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Manrope:wght@700;800&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary": "#ffffff",
+                        "secondary-container": "#66affe",
+                        "surface": "#f8f9fa",
+                        "surface-container-highest": "#e1e3e4",
+                        "secondary": "#0061a5",
+                        "on-secondary": "#ffffff",
+                        "background": "#f8f9fa",
+                        "on-tertiary-fixed": "#111d22",
+                        "outline-variant": "#c6c6cc",
+                        "error": "#ba1a1a",
+                        "on-error-container": "#93000a",
+                        "primary-fixed-dim": "#c1c6d7",
+                        "on-secondary-fixed-variant": "#00497e",
+                        "surface-container-low": "#f3f4f5",
+                        "tertiary": "#010a0f",
+                        "inverse-on-surface": "#f0f1f2",
+                        "primary": "#030813",
+                        "secondary-fixed-dim": "#9fcaff",
+                        "on-surface": "#191c1d",
+                        "on-background": "#191c1d",
+                        "inverse-primary": "#c1c6d7",
+                        "on-primary": "#ffffff",
+                        "on-tertiary-fixed-variant": "#3c494e",
+                        "on-primary-container": "#828796",
+                        "on-tertiary-container": "#7d8a90",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary-fixed": "#d8e4eb",
+                        "surface-container-high": "#e7e8e9",
+                        "surface-container": "#edeeef",
+                        "on-surface-variant": "#45474c",
+                        "surface-variant": "#e1e3e4",
+                        "error-container": "#ffdad6",
+                        "on-secondary-fixed": "#001d37",
+                        "primary-fixed": "#dde2f3",
+                        "secondary-fixed": "#d2e4ff",
+                        "on-secondary-container": "#004172",
+                        "tertiary-fixed-dim": "#bcc8cf",
+                        "surface-tint": "#585e6c",
+                        "on-primary-fixed": "#161c27",
+                        "surface-dim": "#d9dadb",
+                        "tertiary-container": "#162227",
+                        "primary-container": "#1a202c",
+                        "surface-bright": "#f8f9fa",
+                        "inverse-surface": "#2e3132",
+                        "on-primary-fixed-variant": "#414754",
+                        "on-error": "#ffffff",
+                        "outline": "#76777c"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .font-headline { font-family: 'Manrope', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface selection:bg-secondary-container selection:text-on-secondary-container">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-slate-50/80 backdrop-blur-xl shadow-sm shadow-slate-200/20 no-border bg-gradient-to-b from-slate-100/50 to-transparent">
+<div class="flex justify-between items-center w-full px-6 py-4 max-w-screen-2xl mx-auto">
+<div class="text-2xl font-black text-slate-900 tracking-tighter font-headline">Ante</div>
+<div class="hidden md:flex items-center gap-8 font-manrope font-bold tracking-tight">
+<a class="text-slate-500 font-medium hover:text-slate-900 transition-colors duration-300" href="#">Explore</a>
+<a class="text-slate-500 font-medium hover:text-slate-900 transition-colors duration-300" href="#">How it Works</a>
+<a class="text-slate-500 font-medium hover:text-slate-900 transition-colors duration-300" href="#">Leaderboard</a>
+</div>
+<div class="flex items-center gap-4">
+<button class="bg-primary text-on-primary px-5 py-2.5 rounded-lg text-sm font-bold scale-95 active:opacity-80 transition-transform">
+                    Connect Wallet
+                </button>
+</div>
+</div>
+</nav>
+<main class="pt-24 pb-12 px-6 max-w-screen-2xl mx-auto">
+<!-- Header Section -->
+<header class="mb-12">
+<h1 class="text-5xl font-extrabold font-headline text-primary tracking-tighter mb-2">Command Center</h1>
+<p class="text-on-surface-variant font-medium tracking-tight">Welcome back, alex_eth. Your protocol standing is exceptional.</p>
+</header>
+<!-- Stats Bento Grid -->
+<section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+<div class="bg-surface-container-lowest p-8 rounded-xl flex flex-col gap-1">
+<span class="text-xs font-bold uppercase tracking-widest text-on-surface-variant/60">Total won</span>
+<span class="text-4xl font-black font-headline text-secondary tracking-tight">142.50 ETH</span>
+<div class="mt-4 flex items-center gap-2 text-sm font-semibold text-secondary">
+<span class="material-symbols-outlined" data-icon="trending_up">trending_up</span>
+<span>+12.4% from last period</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-8 rounded-xl flex flex-col gap-1">
+<span class="text-xs font-bold uppercase tracking-widest text-on-surface-variant/60">Accuracy percentage</span>
+<span class="text-4xl font-black font-headline text-secondary tracking-tight">98.2%</span>
+<div class="mt-4 flex items-center gap-2 text-sm font-semibold text-secondary">
+<span class="material-symbols-outlined" data-icon="verified">verified</span>
+<span>Top 1% of contributors</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-8 rounded-xl flex flex-col gap-1">
+<span class="text-xs font-bold uppercase tracking-widest text-on-surface-variant/60">Reputation score</span>
+<span class="text-4xl font-black font-headline text-secondary tracking-tight">4,920</span>
+<div class="mt-4 flex items-center gap-2 text-sm font-semibold text-secondary">
+<span class="material-symbols-outlined" data-icon="shield">shield</span>
+<span>Architect Level III</span>
+</div>
+</div>
+</section>
+<!-- Main Dashboard Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+<!-- Active Participation (Challenges) -->
+<section class="lg:col-span-8">
+<div class="flex items-center justify-between mb-8">
+<h2 class="text-2xl font-bold font-headline text-primary tracking-tight">Active Participation</h2>
+<button class="text-sm font-bold text-secondary hover:underline underline-offset-4 transition-all">View All Challenges</button>
+</div>
+<div class="flex flex-col gap-6">
+<!-- Challenge Card 1 -->
+<div class="bg-surface-container-lowest p-1 rounded-xl shadow-sm shadow-slate-200/40">
+<div class="p-6 flex flex-col md:flex-row gap-6">
+<div class="w-24 h-24 rounded-lg overflow-hidden flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="abstract digital artwork of interconnected silver nodes on a deep navy background with blue neon highlights" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDwyexmjrXNkx-qbqmih_sAfsh3iFyNudkl3QBuZUPbCOV1JSuA6rj18AYp2hIPgGxOZeW2wQF-Xoi8KU2GoJgdbHJ0V6pgAwaDdCkJSMRjZRxP2h-OjDgHhqSql9b1lschWGGdNEmZXqgStRavdBw_4hoEeZM6P2Bd95QagHiihTSNf5qlHDFPtOdWdgLzeUFIUpPZw9uD9w_S7eFCKRUg4hainqdmYc41Bi0HH5gSeUiDd6oKu7mH3HqajtqARrZR2LJ0KUJEHeAF"/>
+</div>
+<div class="flex-grow">
+<div class="flex justify-between items-start mb-1">
+<h3 class="text-lg font-bold font-headline text-primary">Decentralized Storage Audit</h3>
+<span class="px-3 py-1 bg-secondary-fixed text-on-secondary-fixed text-xs font-bold rounded-full">Active</span>
+</div>
+<p class="text-sm text-on-surface-variant mb-4 leading-relaxed">Verifying proof-of-replication consistency across Tier 4 node clusters in the Arctic region.</p>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2 text-xs font-semibold text-on-surface-variant">
+<span class="material-symbols-outlined text-sm" data-icon="payments">payments</span>
+<span>Bounty: 4.5 ETH</span>
+</div>
+<div class="flex items-center gap-2 text-xs font-semibold text-on-surface-variant">
+<span class="material-symbols-outlined text-sm" data-icon="schedule">schedule</span>
+<span>Ends in 4h 12m</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Challenge Card 2 -->
+<div class="bg-surface-container-lowest p-1 rounded-xl shadow-sm shadow-slate-200/40">
+<div class="p-6 flex flex-col md:flex-row gap-6">
+<div class="w-24 h-24 rounded-lg overflow-hidden flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="macro photograph of crystalline structures resembling frost on glass with sharp white edges and deep blue shadows" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDAMuRN8GqucEtdGMMCKS9cgrjU5SxAuoZNyrInq4CY_WkvMVokHB8ayjpEUqpCgM0k0rU9TM3VrYTnpKyHxzLm3VMW35YWhaOhPwMCo6yIWdcOkyaFD6DC8t8mqE5erBcdnIjbHjXmLPaYlIERR0cO6nSOxYWJg-xJRGrEYRUCR4b2IoT3LntBytgdVgyXAaziewCP3FKBmUU28xhpZMR4KEvUIdAby-Em3_eOBxXPXjxRAI2mWwPZAgktRJHXDChsLbn2bgat4xfc"/>
+</div>
+<div class="flex-grow">
+<div class="flex justify-between items-start mb-1">
+<h3 class="text-lg font-bold font-headline text-primary">ZK-Proof Validation Bridge</h3>
+<span class="px-3 py-1 bg-surface-container-high text-on-surface-variant text-xs font-bold rounded-full">Pending</span>
+</div>
+<p class="text-sm text-on-surface-variant mb-4 leading-relaxed">Optimization of zero-knowledge circuits for cross-chain liquidity migration between Layer 2s.</p>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2 text-xs font-semibold text-on-surface-variant">
+<span class="material-symbols-outlined text-sm" data-icon="payments">payments</span>
+<span>Bounty: 12.0 ETH</span>
+</div>
+<div class="flex items-center gap-2 text-xs font-semibold text-on-surface-variant">
+<span class="material-symbols-outlined text-sm" data-icon="group">group</span>
+<span>32 Participants</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Challenge Card 3 (Posted by User) -->
+<div class="bg-surface-container-lowest p-1 rounded-xl border-2 border-secondary-fixed shadow-sm shadow-slate-200/40">
+<div class="p-6 flex flex-col md:flex-row gap-6">
+<div class="w-24 h-24 rounded-lg overflow-hidden flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="minimalist architectural shot of a sleek black monolith standing in a vast white snowy landscape under a pale blue sky" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAkNI15tANIgUDBZxD5Ew-cdVrI42EMoJqlvqS2mP3fg0Iu7n9Jw6eBUdaSCXAIV8lroI69sL_Ml8dGF1R5YAIQRZud41fFmn5MViwXKkSM2sjm1G3lF_aYpgvrhb6QQHnyZW0x_OvigqSZqWPcTrMcKFixkDGlXBqDZoOgwDXqp-6GCyCOoNRXNEzuuvOhNWBsKN6iInv71BkjGfKBXGJteRimqq8mt8bW9hjy7by_Mqd4Um8rzqyihYFxLCs6fhTVG1fuH28Jl9oQ"/>
+</div>
+<div class="flex-grow">
+<div class="flex justify-between items-start mb-1">
+<h3 class="text-lg font-bold font-headline text-primary">Liquidity Pool Stress Test</h3>
+<span class="px-3 py-1 bg-primary text-on-primary text-xs font-bold rounded-full">My Post</span>
+</div>
+<p class="text-sm text-on-surface-variant mb-4 leading-relaxed">Soliciting white-hat attacks on a fork of the Monolith v3 AMM to identify slippage exploits.</p>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2 text-xs font-semibold text-on-surface-variant">
+<span class="material-symbols-outlined text-sm" data-icon="payments">payments</span>
+<span>Committed: 25.0 ETH</span>
+</div>
+<div class="flex items-center gap-2 text-xs font-semibold text-on-surface-variant text-error">
+<span class="material-symbols-outlined text-sm" data-icon="warning">warning</span>
+<span>Critical Vulnerability Reported</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Rewards Ledger -->
+<aside class="lg:col-span-4">
+<div class="bg-surface-container-low rounded-xl p-8 sticky top-28">
+<h2 class="text-xl font-bold font-headline text-primary tracking-tight mb-8">Rewards Ledger</h2>
+<div class="flex flex-col gap-6">
+<!-- Ledger Item -->
+<div class="flex justify-between items-center group">
+<div>
+<p class="text-sm font-bold text-primary group-hover:text-secondary transition-colors">Protocol Audit #882</p>
+<p class="text-xs text-on-surface-variant">Oct 24, 2024</p>
+</div>
+<div class="text-right">
+<p class="text-sm font-black font-headline text-primary">+1.25 ETH</p>
+<p class="text-[10px] uppercase font-bold tracking-widest text-secondary">Verified</p>
+</div>
+</div>
+<!-- Ledger Item -->
+<div class="flex justify-between items-center group">
+<div>
+<p class="text-sm font-bold text-primary group-hover:text-secondary transition-colors">Governance Proposal Staking</p>
+<p class="text-xs text-on-surface-variant">Oct 21, 2024</p>
+</div>
+<div class="text-right">
+<p class="text-sm font-black font-headline text-primary">+0.08 ETH</p>
+<p class="text-[10px] uppercase font-bold tracking-widest text-secondary">Verified</p>
+</div>
+</div>
+<!-- Ledger Item -->
+<div class="flex justify-between items-center group">
+<div>
+<p class="text-sm font-bold text-primary group-hover:text-secondary transition-colors">Node Operator Yield</p>
+<p class="text-xs text-on-surface-variant">Oct 19, 2024</p>
+</div>
+<div class="text-right">
+<p class="text-sm font-black font-headline text-primary">+5.42 ETH</p>
+<p class="text-[10px] uppercase font-bold tracking-widest text-secondary">Verified</p>
+</div>
+</div>
+<!-- Ledger Item -->
+<div class="flex justify-between items-center group">
+<div>
+<p class="text-sm font-bold text-primary group-hover:text-secondary transition-colors">Bug Bounty: CSS Inject</p>
+<p class="text-xs text-on-surface-variant">Oct 15, 2024</p>
+</div>
+<div class="text-right">
+<p class="text-sm font-black font-headline text-primary">+0.50 ETH</p>
+<p class="text-[10px] uppercase font-bold tracking-widest text-secondary">Verified</p>
+</div>
+</div>
+<!-- Ledger Item -->
+<div class="flex justify-between items-center group">
+<div>
+<p class="text-sm font-bold text-primary group-hover:text-secondary transition-colors">Oracle Validation Reward</p>
+<p class="text-xs text-on-surface-variant">Oct 12, 2024</p>
+</div>
+<div class="text-right">
+<p class="text-sm font-black font-headline text-primary">+0.12 ETH</p>
+<p class="text-[10px] uppercase font-bold tracking-widest text-secondary">Verified</p>
+</div>
+</div>
+</div>
+<button class="w-full mt-12 py-4 bg-surface-container-highest text-primary text-sm font-bold rounded-lg hover:bg-white transition-all">
+                        Download Full Statement (CSV)
+                    </button>
+</div>
+</aside>
+</div>
+</main>
+<!-- Footer -->
+<footer class="w-full py-12 bg-slate-100 no-border bg-slate-50">
+<div class="flex flex-col md:flex-row justify-between items-center px-8 max-w-7xl mx-auto font-inter text-sm tracking-wide text-slate-600">
+<div class="mb-4 md:mb-0">© 2024 Ante. Built on the Monolith.</div>
+<div class="flex gap-8">
+<a class="text-slate-500 hover:text-slate-900 underline-offset-4 hover:underline transition-opacity" href="#">Docs</a>
+<a class="text-slate-500 hover:text-slate-900 underline-offset-4 hover:underline transition-opacity" href="#">Discord</a>
+<a class="text-slate-500 hover:text-slate-900 underline-offset-4 hover:underline transition-opacity" href="#">Status</a>
+</div>
+</div>
+</footer>
+</body></html>

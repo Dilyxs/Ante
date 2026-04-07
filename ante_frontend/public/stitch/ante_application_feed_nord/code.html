@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-tertiary": "#ffffff",
+                    "secondary-container": "#66affe",
+                    "surface": "#f8f9fa",
+                    "surface-container-highest": "#e1e3e4",
+                    "secondary": "#0061a5",
+                    "on-secondary": "#ffffff",
+                    "background": "#f8f9fa",
+                    "on-tertiary-fixed": "#111d22",
+                    "outline-variant": "#c6c6cc",
+                    "error": "#ba1a1a",
+                    "on-error-container": "#93000a",
+                    "primary-fixed-dim": "#c1c6d7",
+                    "on-secondary-fixed-variant": "#00497e",
+                    "surface-container-low": "#f3f4f5",
+                    "tertiary": "#010a0f",
+                    "inverse-on-surface": "#f0f1f2",
+                    "primary": "#030813",
+                    "secondary-fixed-dim": "#9fcaff",
+                    "on-surface": "#191c1d",
+                    "on-background": "#191c1d",
+                    "inverse-primary": "#c1c6d7",
+                    "on-primary": "#ffffff",
+                    "on-tertiary-fixed-variant": "#3c494e",
+                    "on-primary-container": "#828796",
+                    "on-tertiary-container": "#7d8a90",
+                    "surface-container-lowest": "#ffffff",
+                    "tertiary-fixed": "#d8e4eb",
+                    "surface-container-high": "#e7e8e9",
+                    "surface-container": "#edeeef",
+                    "on-surface-variant": "#45474c",
+                    "surface-variant": "#e1e3e4",
+                    "error-container": "#ffdad6",
+                    "on-secondary-fixed": "#001d37",
+                    "primary-fixed": "#dde2f3",
+                    "secondary-fixed": "#d2e4ff",
+                    "on-secondary-container": "#004172",
+                    "tertiary-fixed-dim": "#bcc8cf",
+                    "surface-tint": "#585e6c",
+                    "on-primary-fixed": "#161c27",
+                    "surface-dim": "#d9dadb",
+                    "tertiary-container": "#162227",
+                    "primary-container": "#1a202c",
+                    "surface-bright": "#f8f9fa",
+                    "inverse-surface": "#2e3132",
+                    "on-primary-fixed-variant": "#414754",
+                    "on-error": "#ffffff",
+                    "outline": "#76777c"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "1rem",
+                    "xl": "1.25rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Manrope"],
+                    "body": ["Inter"],
+                    "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .arctic-glass {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .hero-gradient {
+            background: radial-gradient(circle at top right, #d2e4ff 0%, #f8f9fa 60%);
+        }
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, .font-headline { font-family: 'Manrope', sans-serif; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface selection:bg-secondary-fixed">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-xl shadow-sm shadow-slate-200/20">
+<div class="flex justify-between items-center w-full px-6 py-4 max-w-screen-2xl mx-auto">
+<div class="text-2xl font-black text-slate-900 dark:text-slate-50 tracking-tighter">Ante</div>
+<div class="hidden md:flex items-center space-x-8">
+<a class="text-slate-900 dark:text-white font-extrabold border-b-2 border-slate-900 dark:border-white pb-1 transition-colors duration-300" href="#">Explore</a>
+<a class="text-slate-500 dark:text-slate-400 font-medium hover:text-slate-900 dark:hover:text-white transition-colors duration-300" href="#">How it Works</a>
+<a class="text-slate-500 dark:text-slate-400 font-medium hover:text-slate-900 dark:hover:text-white transition-colors duration-300" href="#">Leaderboard</a>
+</div>
+<div class="flex items-center gap-4">
+<button class="bg-primary text-on-primary px-5 py-2.5 rounded-lg font-headline font-bold text-sm transition-transform scale-95 active:opacity-80">
+                    Connect Wallet
+                </button>
+<div class="w-10 h-10 rounded-full bg-surface-container-highest overflow-hidden">
+<img alt="User Profile Avatar" data-alt="close-up portrait of a professional man with neutral expression, minimalist lighting and soft grey background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBm3_lAO7P_8E-ac9m_OItfXTvvjB7NKE142R0X3Z6xfACv2c3IiDgHHYK3bZhE6bnOB_234Ck0_YVyBcaD_SU4-Ee7QM7h6r_c-fcfYRBgwtuJFJ5aSixqvoMC32te7SZ8OEKQWxrJIM8QUadtiZX79bb3ui4NCNBhTCFF6cvjB0O7KaXASLiW5dmic7HdIUVHtr8oyxuMEKqfbtj7yem7Yuxdwy3nTHXmQkj0Hc-xpsIBwG__Zfc2FooP3k9vo4mZ-FvwcnPKIgEZ"/>
+</div>
+</div>
+</div>
+</nav>
+<main class="pt-24 pb-20 px-6 max-w-screen-2xl mx-auto">
+<!-- Hyper-Graph Featured Section -->
+<section class="mb-12 relative overflow-hidden rounded-xl bg-surface-container-lowest p-8 md:p-12 hero-gradient min-h-[400px] flex items-center">
+<div class="relative z-10 grid md:grid-cols-2 gap-12 items-center w-full">
+<div>
+<span class="inline-block px-3 py-1 rounded-full bg-secondary-fixed text-on-secondary-fixed text-xs font-bold tracking-wider mb-6">FEATURED CHALLENGE</span>
+<h1 class="text-4xl md:text-6xl font-headline font-extrabold tracking-tight text-primary mb-6 leading-tight">
+                        The Glacial <br/>Protocol Audit
+                    </h1>
+<p class="text-on-surface-variant text-lg max-w-md mb-8 leading-relaxed">
+                        Secure the core liquidity vaults of the Arctic Ledger. High-stakes vulnerability discovery with a direct path to the monolith.
+                    </p>
+<div class="flex items-center gap-6">
+<div class="flex flex-col">
+<span class="text-xs font-bold text-on-surface-variant uppercase tracking-widest">Active Pool</span>
+<span class="text-3xl font-headline font-black text-secondary">250,000 USDC</span>
+</div>
+<button class="bg-primary text-on-primary px-8 py-4 rounded-lg font-headline font-bold transition-transform hover:scale-[1.02] active:scale-95">
+                            Join Challenge
+                        </button>
+</div>
+</div>
+<div class="hidden md:block relative">
+<div class="absolute inset-0 bg-secondary-container/10 blur-[100px] rounded-full"></div>
+<div class="relative bg-white/40 backdrop-blur-md rounded-xl p-6 border border-white/40 shadow-xl">
+<!-- Simplified Hyper-Graph Visualization -->
+<div class="flex flex-col gap-4">
+<div class="flex justify-between items-end h-40 gap-2">
+<div class="w-full bg-secondary/20 rounded-t-sm h-1/3"></div>
+<div class="w-full bg-secondary/40 rounded-t-sm h-1/2"></div>
+<div class="w-full bg-secondary/60 rounded-t-sm h-3/4"></div>
+<div class="w-full bg-secondary/30 rounded-t-sm h-2/5"></div>
+<div class="w-full bg-secondary rounded-t-sm h-full"></div>
+<div class="w-full bg-secondary/50 rounded-t-sm h-2/3"></div>
+</div>
+<div class="flex justify-between text-[10px] font-bold text-on-surface-variant tracking-tighter">
+<span>BLOCK 18.2K</span>
+<span>NETWORK VELOCITY</span>
+<span>SYNC: 99.9%</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<div class="grid lg:grid-cols-12 gap-8">
+<!-- Left Column: Activity Widgets -->
+<aside class="lg:col-span-3 space-y-8">
+<!-- Recent Solvers -->
+<div class="bg-surface-container-low rounded-xl p-6">
+<h3 class="text-sm font-headline font-extrabold tracking-widest text-primary mb-6 uppercase">Top Solvers</h3>
+<div class="space-y-5">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-surface-container-highest overflow-hidden">
+<img alt="Solver Avatar" data-alt="minimalist portrait of a tech professional looking at camera, studio lighting, clean blue background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBgbj_ZPVdwiCBMQ3T5198OYU1B1yq-7ToCgAm53-x4D2oPMJx0cIEi_rWuCHwh4q9YdO81t8ZJBqdbvKwGDCIeXKBiIYIL98oZkQrOiRV_rE3_FL-zk0Tb0llg0MBZBo3qFfK-pJMMqavOGCISOW-NS6BrLMNSdaK1HtYdibqRnPhQeyn8uDnyZhUHAmeJJlClbjj5gZWhB68yz_n4Hs0ZMYou5gNRYA-Y_DCFxcj7tD_REzv-t1F_2SBkNhxvoqJ_4GWOXxuLHqlD"/>
+</div>
+<div class="flex flex-col">
+<span class="text-xs font-bold text-primary">0xArctic...42</span>
+<span class="text-[10px] text-on-surface-variant">12.4k ANTE Earned</span>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-surface-container-highest overflow-hidden">
+<img alt="Solver Avatar" data-alt="professional woman profile photo, minimalist tech aesthetic, soft natural lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCh5TXNHbQfcII2NaCXQdTlk9FxvRLbgiSSSS-fe7732gsStNzLx3GGhTSx2-RPXDQe5V5LXQcv532ksF1CJVEkLWL-XDtbOeaTlt32uaFxyteMCkGi-CjCBPW9M3pBdVJw5q7Ic7o5bd_BX4DIwpS9C0Qikgiib_E3raN1llkLyDDXSRtKmxMNFCTc24rFAp8lkJrYsYh-D5zrmzw8VeVOMcgFRkcq9eaOsL4dR8rKI014BVDOjKkzwD-Hs7TR966L-Nl0BfqEtdYR"/>
+</div>
+<div class="flex flex-col">
+<span class="text-xs font-bold text-primary">cryp.tundra</span>
+<span class="text-[10px] text-on-surface-variant">8.9k ANTE Earned</span>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-surface-container-highest overflow-hidden">
+<img alt="Solver Avatar" data-alt="young designer with creative aesthetic, soft focus background, cool daylight" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDRhF6cvE3kY2v--3hLZMOnr3Vu9CKN5kRrMWQW4UOvYOQab0bnes1IA5yH77lh10H_3RC80x9dmC20S4-UtKi7f7k4e01tQSe-EyDWsTEBQp0zSod-0mzffFIEVfwZY6CudE06uCqDa-RvTJ4lU_YNyCukYRawtIgnzP8rndwX8xI7qkyZnNZIzPNTo93twJYuhOA_MNiYAjOOfWnX3Pd4OMLo0cSlv1MokK5fYUL2xWFON_zyTTfRaJ9r7FTbHBuZemEXzi5c8YKU"/>
+</div>
+<div class="flex flex-col">
+<span class="text-xs font-bold text-primary">velox_node</span>
+<span class="text-[10px] text-on-surface-variant">7.2k ANTE Earned</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Live Network Stats -->
+<div class="bg-primary text-on-primary rounded-xl p-6">
+<h3 class="text-sm font-headline font-extrabold tracking-widest mb-6 uppercase opacity-60">Network Activity</h3>
+<div class="space-y-4">
+<div class="flex justify-between items-center">
+<span class="text-xs text-on-primary/60">Total Voted</span>
+<span class="text-sm font-bold">1.2M ANTE</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="text-xs text-on-primary/60">Active Nodes</span>
+<span class="text-sm font-bold">482</span>
+</div>
+<div class="w-full h-1 bg-on-primary/10 rounded-full overflow-hidden mt-4">
+<div class="w-[72%] h-full bg-secondary-container"></div>
+</div>
+<span class="text-[10px] block text-center text-on-primary/40 uppercase font-bold tracking-widest pt-2">System Optimal</span>
+</div>
+</div>
+</aside>
+<!-- Main Column: The Feed -->
+<div class="lg:col-span-9">
+<div class="flex items-center justify-between mb-8">
+<div class="flex gap-8">
+<button class="text-sm font-headline font-black border-b-2 border-primary pb-2">Active Bounties</button>
+<button class="text-sm font-headline font-bold text-on-surface-variant hover:text-primary transition-colors pb-2">Completed</button>
+<button class="text-sm font-headline font-bold text-on-surface-variant hover:text-primary transition-colors pb-2">Disputed</button>
+</div>
+<div class="flex items-center gap-2 text-xs font-bold text-on-surface-variant">
+<span class="material-symbols-outlined text-sm">filter_list</span>
+                        SORT BY: NEWEST
+                    </div>
+</div>
+<div class="space-y-4">
+<!-- Feed Item 1 -->
+<div class="group bg-surface-container-lowest hover:bg-white transition-all p-6 rounded-xl border border-transparent hover:shadow-xl hover:shadow-slate-200/40">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+<div class="flex gap-6 items-start">
+<div class="w-14 h-14 rounded-xl bg-surface-container-low flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-secondary text-3xl">terminal</span>
+</div>
+<div class="space-y-1">
+<div class="flex items-center gap-2">
+<span class="text-[10px] font-black text-secondary tracking-widest uppercase">Security</span>
+<span class="w-1 h-1 rounded-full bg-outline-variant"></span>
+<span class="text-[10px] font-bold text-on-surface-variant">2 hours ago</span>
+</div>
+<h2 class="text-xl font-headline font-extrabold text-primary group-hover:text-secondary transition-colors">Cross-Chain Bridge Stress Test</h2>
+<p class="text-on-surface-variant text-sm line-clamp-1 max-w-xl">Identify potential race conditions in the validator consensus mechanism during high-congestion periods.</p>
+</div>
+</div>
+<div class="flex items-center justify-between md:flex-col md:items-end gap-2">
+<span class="text-2xl font-headline font-black text-secondary">45,000 <span class="text-xs uppercase text-on-surface-variant font-bold">USDC</span></span>
+<button class="bg-surface-container text-primary font-bold px-4 py-2 rounded-lg text-xs hover:bg-primary hover:text-on-primary transition-colors">
+                                    View Bounty
+                                </button>
+</div>
+</div>
+</div>
+<!-- Feed Item 2 -->
+<div class="group bg-surface-container-lowest hover:bg-white transition-all p-6 rounded-xl border border-transparent hover:shadow-xl hover:shadow-slate-200/40">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+<div class="flex gap-6 items-start">
+<div class="w-14 h-14 rounded-xl bg-surface-container-low flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-secondary text-3xl">monitoring</span>
+</div>
+<div class="space-y-1">
+<div class="flex items-center gap-2">
+<span class="text-[10px] font-black text-secondary tracking-widest uppercase">Performance</span>
+<span class="w-1 h-1 rounded-full bg-outline-variant"></span>
+<span class="text-[10px] font-bold text-on-surface-variant">5 hours ago</span>
+</div>
+<h2 class="text-xl font-headline font-extrabold text-primary group-hover:text-secondary transition-colors">RPC Node Latency Optimization</h2>
+<p class="text-on-surface-variant text-sm line-clamp-1 max-w-xl">Proposal for reducing global broadcast latency for Asia-Pacific validator clusters.</p>
+</div>
+</div>
+<div class="flex items-center justify-between md:flex-col md:items-end gap-2">
+<span class="text-2xl font-headline font-black text-secondary">12,500 <span class="text-xs uppercase text-on-surface-variant font-bold">USDC</span></span>
+<button class="bg-surface-container text-primary font-bold px-4 py-2 rounded-lg text-xs hover:bg-primary hover:text-on-primary transition-colors">
+                                    View Bounty
+                                </button>
+</div>
+</div>
+</div>
+<!-- Feed Item 3 -->
+<div class="group bg-surface-container-lowest hover:bg-white transition-all p-6 rounded-xl border border-transparent hover:shadow-xl hover:shadow-slate-200/40">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+<div class="flex gap-6 items-start">
+<div class="w-14 h-14 rounded-xl bg-surface-container-low flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-secondary text-3xl">token</span>
+</div>
+<div class="space-y-1">
+<div class="flex items-center gap-2">
+<span class="text-[10px] font-black text-secondary tracking-widest uppercase">Protocol</span>
+<span class="w-1 h-1 rounded-full bg-outline-variant"></span>
+<span class="text-[10px] font-bold text-on-surface-variant">12 hours ago</span>
+</div>
+<h2 class="text-xl font-headline font-extrabold text-primary group-hover:text-secondary transition-colors">Governance Tokenomics Review</h2>
+<p class="text-on-surface-variant text-sm line-clamp-1 max-w-xl">Quantitative analysis of staking rewards and long-term emission schedule sustainability.</p>
+</div>
+</div>
+<div class="flex items-center justify-between md:flex-col md:items-end gap-2">
+<span class="text-2xl font-headline font-black text-secondary">8,000 <span class="text-xs uppercase text-on-surface-variant font-bold">USDC</span></span>
+<button class="bg-surface-container text-primary font-bold px-4 py-2 rounded-lg text-xs hover:bg-primary hover:text-on-primary transition-colors">
+                                    View Bounty
+                                </button>
+</div>
+</div>
+</div>
+<!-- Feed Item 4 -->
+<div class="group bg-surface-container-lowest hover:bg-white transition-all p-6 rounded-xl border border-transparent hover:shadow-xl hover:shadow-slate-200/40">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+<div class="flex gap-6 items-start">
+<div class="w-14 h-14 rounded-xl bg-surface-container-low flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-secondary text-3xl">palette</span>
+</div>
+<div class="space-y-1">
+<div class="flex items-center gap-2">
+<span class="text-[10px] font-black text-secondary tracking-widest uppercase">Frontend</span>
+<span class="w-1 h-1 rounded-full bg-outline-variant"></span>
+<span class="text-[10px] font-bold text-on-surface-variant">1 day ago</span>
+</div>
+<h2 class="text-xl font-headline font-extrabold text-primary group-hover:text-secondary transition-colors">Mobile Dashboard Refresh</h2>
+<p class="text-on-surface-variant text-sm line-clamp-1 max-w-xl">Redesign of the mobile experience for better visibility of active bounty participation.</p>
+</div>
+</div>
+<div class="flex items-center justify-between md:flex-col md:items-end gap-2">
+<span class="text-2xl font-headline font-black text-secondary">5,000 <span class="text-xs uppercase text-on-surface-variant font-bold">USDC</span></span>
+<button class="bg-surface-container text-primary font-bold px-4 py-2 rounded-lg text-xs hover:bg-primary hover:text-on-primary transition-colors">
+                                    View Bounty
+                                </button>
+</div>
+</div>
+</div>
+</div>
+<!-- Load More -->
+<div class="mt-12 flex justify-center">
+<button class="group flex items-center gap-2 text-on-surface-variant font-bold hover:text-primary transition-colors">
+<span>Load older entries</span>
+<span class="material-symbols-outlined text-lg group-hover:translate-y-1 transition-transform">expand_more</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="w-full py-12 bg-slate-50 dark:bg-slate-900/50">
+<div class="flex flex-col md:flex-row justify-between items-center px-8 max-w-7xl mx-auto font-inter text-sm tracking-wide">
+<div class="text-slate-600 dark:text-slate-400 mb-6 md:mb-0">
+                © 2024 Ante. Built on the Monolith.
+            </div>
+<div class="flex space-x-8">
+<a class="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white underline-offset-4 hover:underline transition-opacity" href="#">Docs</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white underline-offset-4 hover:underline transition-opacity" href="#">Discord</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white underline-offset-4 hover:underline transition-opacity" href="#">Status</a>
+</div>
+</div>
+</footer>
+</body></html>

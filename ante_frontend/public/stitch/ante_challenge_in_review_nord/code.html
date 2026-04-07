@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Ante - In-Review Phase</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "secondary-container": "#66affe",
+                    "on-tertiary": "#ffffff",
+                    "surface": "#f8f9fa",
+                    "on-tertiary-fixed-variant": "#3c494e",
+                    "on-primary-fixed-variant": "#414754",
+                    "outline": "#76777c",
+                    "surface-container-highest": "#e1e3e4",
+                    "inverse-on-surface": "#f0f1f2",
+                    "on-secondary-fixed-variant": "#00497e",
+                    "surface-container-lowest": "#ffffff",
+                    "primary-fixed": "#dde2f3",
+                    "on-primary-fixed": "#161c27",
+                    "inverse-primary": "#c1c6d7",
+                    "on-tertiary-container": "#7d8a90",
+                    "surface-variant": "#e1e3e4",
+                    "inverse-surface": "#2e3132",
+                    "background": "#f8f9fa",
+                    "surface-dim": "#d9dadb",
+                    "outline-variant": "#c6c6cc",
+                    "surface-bright": "#f8f9fa",
+                    "tertiary-container": "#162227",
+                    "error": "#ba1a1a",
+                    "secondary-fixed-dim": "#9fcaff",
+                    "on-error-container": "#93000a",
+                    "on-error": "#ffffff",
+                    "on-primary": "#ffffff",
+                    "on-tertiary-fixed": "#111d22",
+                    "on-surface-variant": "#45474c",
+                    "on-surface": "#191c1d",
+                    "primary-fixed-dim": "#c1c6d7",
+                    "on-secondary-fixed": "#001d37",
+                    "surface-container-low": "#f3f4f5",
+                    "primary": "#030813",
+                    "on-secondary": "#ffffff",
+                    "on-background": "#191c1d",
+                    "tertiary-fixed": "#d8e4eb",
+                    "surface-container-high": "#e7e8e9",
+                    "error-container": "#ffdad6",
+                    "secondary-fixed": "#d2e4ff",
+                    "tertiary-fixed-dim": "#bcc8cf",
+                    "primary-container": "#1a202c",
+                    "tertiary": "#010a0f",
+                    "surface-tint": "#585e6c",
+                    "on-secondary-container": "#004172",
+                    "secondary": "#0061a5",
+                    "on-primary-container": "#828796",
+                    "surface-container": "#edeeef"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Manrope"],
+                    "body": ["Inter"],
+                    "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3 { font-family: 'Manrope', sans-serif; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface min-h-screen">
+<!-- TopNavBar (App Type) -->
+<nav class="fixed top-0 w-full z-50 flex justify-between items-center px-6 py-3 bg-[#ffffff]/80 dark:bg-[#1a202c]/80 backdrop-blur-xl shadow-[0_20px_60px_rgba(25,28,29,0.04)]">
+<div class="flex items-center gap-8">
+<span class="text-xl font-black tracking-tight text-[#030813] dark:text-[#ffffff]">Ante</span>
+<div class="hidden md:flex gap-6">
+<a class="text-[#45474c] dark:text-[#c6c6cc] hover:bg-[#f3f4f5] dark:hover:bg-[#030813] rounded-lg px-3 py-1 transition-opacity" href="#">Feed</a>
+<a class="text-[#45474c] dark:text-[#c6c6cc] hover:bg-[#f3f4f5] dark:hover:bg-[#030813] rounded-lg px-3 py-1 transition-opacity" href="#">Create Bounty</a>
+<a class="text-[#030813] dark:text-[#ffffff] font-semibold border-b-2 border-[#030813] px-1" href="#">My Dashboard</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer opacity-80 hover:opacity-100 transition-opacity">notifications</span>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer opacity-80 hover:opacity-100 transition-opacity">account_balance_wallet</span>
+<div class="w-8 h-8 rounded-full overflow-hidden bg-surface-container">
+<img alt="User Wallet Avatar" class="w-full h-full object-cover" data-alt="abstract crystalline geometry with soft blue and silver gradients representing a digital blockchain avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCWEFV4trlBi_t4m2EBt1hDdOgXDmxo9oBw6j-sjIQcVJwHhmVsyLuu3FBLboROTHKo4mEZEOzIKqI76DvyhuZA-LH68dxjR8Mww8oKTTQMG2G3TkOUsmb72cIpYSxdOE2GuzTKg2WNuK-enXCNbEKxXDiFYr2ez_Yd8611djDL_LmSzZXT1fFtuz6hqIW9SKgmPH6zMPkaiT0B9gmsC2I1tv5xJ9mZhyUtfHZaiTF_YgApfQguul4z-GUncfqZUcJCpihZKPaRF7VW"/>
+</div>
+</div>
+</nav>
+<main class="pt-24 pb-12 px-6 max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
+<!-- Header Section -->
+<header class="lg:col-span-12 mb-4">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+<div>
+<span class="text-secondary font-bold tracking-widest text-xs uppercase mb-2 block">Phase: Final Verification</span>
+<h1 class="text-4xl md:text-5xl font-extrabold tracking-tighter text-primary">In-Review Phase</h1>
+</div>
+<div class="bg-surface-container-low px-6 py-4 rounded-xl flex items-center gap-4">
+<div class="flex items-center gap-2 text-primary font-bold">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">timer</span>
+<span class="text-xl">04:12:55</span>
+</div>
+<div class="h-8 w-px bg-outline-variant/30"></div>
+<span class="text-on-surface-variant text-sm font-medium">Consensus Voting Active</span>
+</div>
+</div>
+</header>
+<!-- Left Column: Protocol & Input -->
+<div class="lg:col-span-7 space-y-8">
+<!-- Protocol Violation Warning Box -->
+<section class="relative overflow-hidden bg-error-container text-on-error-container p-8 rounded-xl">
+<div class="relative z-10 flex gap-6">
+<div class="flex-shrink-0">
+<span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">warning</span>
+</div>
+<div>
+<h3 class="text-xl font-bold mb-2">Protocol Violation Warning</h3>
+<p class="text-sm opacity-90 leading-relaxed max-w-md">
+                            Failure to provide valid hash data or tampering with the consensus mechanism will result in an immediate <strong>slashed stake</strong>. All collateral will be liquidated to the insurance pool if any discrepancy is found during the validation.
+                        </p>
+</div>
+</div>
+<!-- Decorative Monolith Element -->
+<div class="absolute right-0 top-0 h-full w-32 bg-error opacity-10 blur-3xl rounded-full translate-x-16 -translate-y-8"></div>
+</section>
+<!-- Answerer Input Section (Conditional UI) -->
+<section class="bg-surface-container-lowest p-8 rounded-xl shadow-[0_20px_40px_rgba(25,28,29,0.02)]">
+<div class="flex items-center gap-3 mb-8">
+<span class="material-symbols-outlined text-primary">key</span>
+<h2 class="text-2xl font-bold tracking-tight">Final Submission</h2>
+</div>
+<div class="space-y-6">
+<div>
+<label class="block text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-2">Send Hash</label>
+<input class="w-full bg-surface-container-highest border-0 rounded-lg p-4 font-mono text-sm focus:ring-2 focus:ring-primary focus:bg-surface-container-lowest transition-all outline-none" placeholder="0x..." type="text" value="0x7f23a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5"/>
+</div>
+<div>
+<label class="block text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-2">Send Answer</label>
+<textarea class="w-full bg-surface-container-highest border-0 rounded-lg p-4 text-sm focus:ring-2 focus:ring-primary focus:bg-surface-container-lowest transition-all outline-none resize-none" placeholder="Enter the final resolved solution..." rows="4">The cryptographic proof confirms the zero-knowledge validity of the proposed state transition. All 4,096 shards have synchronized successfully without state corruption.</textarea>
+</div>
+<button class="w-full bg-primary text-on-primary py-4 rounded-lg font-bold text-sm tracking-widest uppercase hover:bg-primary-container transition-colors shadow-lg">
+                        Finalize Submission
+                    </button>
+</div>
+</section>
+</div>
+<!-- Right Column: Consensus & Stats -->
+<div class="lg:col-span-5 space-y-8">
+<!-- Consensus Strength Gauge -->
+<section class="bg-surface-container-lowest p-8 rounded-xl shadow-[0_20px_40px_rgba(25,28,29,0.02)] border-t-4 border-secondary-container">
+<div class="flex justify-between items-start mb-6">
+<div>
+<h2 class="text-lg font-bold text-primary">Consensus Strength</h2>
+<p class="text-xs text-on-surface-variant font-medium">Quorum required: 66%</p>
+</div>
+<span class="text-3xl font-black text-secondary">82%</span>
+</div>
+<div class="relative h-4 w-full bg-surface-container rounded-full overflow-hidden mb-6">
+<div class="absolute left-0 top-0 h-full bg-secondary-container transition-all" style="width: 82%;"></div>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="p-4 bg-surface-container-low rounded-lg">
+<span class="text-[10px] uppercase font-bold text-on-surface-variant block mb-1">Participants</span>
+<span class="text-lg font-bold text-primary">1,240</span>
+</div>
+<div class="p-4 bg-surface-container-low rounded-lg">
+<span class="text-[10px] uppercase font-bold text-on-surface-variant block mb-1">Confidence</span>
+<span class="text-lg font-bold text-primary">High</span>
+</div>
+</div>
+</section>
+<!-- Consensus Voting Section -->
+<section class="bg-surface-container-low p-8 rounded-xl">
+<div class="flex items-center justify-between mb-8">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">how_to_vote</span>
+<h2 class="text-xl font-bold tracking-tight">Vote Time!</h2>
+</div>
+<div class="bg-secondary-container/20 text-secondary px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">
+                        Live
+                    </div>
+</div>
+<div class="space-y-4">
+<!-- Solution Option 1 -->
+<div class="bg-surface-container-lowest p-5 rounded-lg border-l-4 border-secondary shadow-sm group hover:scale-[1.02] transition-all cursor-pointer">
+<div class="flex justify-between items-start mb-2">
+<span class="text-xs font-bold text-on-surface-variant">Submission #241</span>
+<span class="text-xs font-bold text-secondary">Current Lead</span>
+</div>
+<p class="text-sm text-primary line-clamp-2 mb-4 leading-relaxed font-medium">
+                            The proposed state transition is valid under the current protocol rules...
+                        </p>
+<div class="flex justify-between items-center">
+<div class="flex -space-x-2">
+<div class="w-6 h-6 rounded-full border-2 border-white bg-surface-dim"></div>
+<div class="w-6 h-6 rounded-full border-2 border-white bg-surface-dim"></div>
+<div class="w-6 h-6 rounded-full border-2 border-white bg-surface-dim"></div>
+</div>
+<button class="text-xs font-bold text-primary flex items-center gap-1 group-hover:underline">
+                                Cast Vote <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Solution Option 2 -->
+<div class="bg-surface-container-lowest/50 p-5 rounded-lg border-l-4 border-outline-variant shadow-sm hover:bg-surface-container-lowest transition-all cursor-pointer">
+<div class="flex justify-between items-start mb-2">
+<span class="text-xs font-bold text-on-surface-variant">Submission #242</span>
+</div>
+<p class="text-sm text-on-surface-variant line-clamp-2 mb-4 leading-relaxed">
+                            Alternative verification through optimistic rollups methodology...
+                        </p>
+<div class="flex justify-between items-center">
+<div class="flex -space-x-2">
+<div class="w-6 h-6 rounded-full border-2 border-white bg-surface-dim"></div>
+<div class="w-6 h-6 rounded-full border-2 border-white bg-surface-dim"></div>
+</div>
+<button class="text-xs font-bold text-on-surface-variant flex items-center gap-1">
+                                Cast Vote <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- Footer -->
+<footer class="w-full py-12 px-8 flex flex-col md:flex-row justify-between items-center gap-6 bg-[#f3f4f5] dark:bg-[#030813]">
+<div class="flex flex-col items-center md:items-start gap-2">
+<span class="text-lg font-bold text-[#030813] dark:text-[#f8f9fa]">Ante Monolith</span>
+<span class="text-[10px] text-[#45474c] dark:text-[#c6c6cc] uppercase tracking-widest">© 2024 Ante Monolith. Built for the Arctic.</span>
+</div>
+<div class="flex gap-8">
+<a class="text-[10px] font-bold text-[#45474c] dark:text-[#c6c6cc] uppercase tracking-wider hover:text-[#66affe] transition-colors" href="#">Privacy Policy</a>
+<a class="text-[10px] font-bold text-[#45474c] dark:text-[#c6c6cc] uppercase tracking-wider hover:text-[#66affe] transition-colors" href="#">Terms of Service</a>
+<a class="text-[10px] font-bold text-[#45474c] dark:text-[#c6c6cc] uppercase tracking-wider hover:text-[#66affe] transition-colors" href="#">Security</a>
+<a class="text-[10px] font-bold text-[#45474c] dark:text-[#c6c6cc] uppercase tracking-wider hover:text-[#66affe] transition-colors" href="#">Docs</a>
+</div>
+</footer>
+</body></html>

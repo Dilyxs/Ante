@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Create Bounty | Ante</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700;800&amp;family=Inter:wght@400;500;600&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary": "#ffffff",
+                        "secondary-container": "#66affe",
+                        "surface": "#f8f9fa",
+                        "surface-container-highest": "#e1e3e4",
+                        "secondary": "#0061a5",
+                        "on-secondary": "#ffffff",
+                        "background": "#f8f9fa",
+                        "on-tertiary-fixed": "#111d22",
+                        "outline-variant": "#c6c6cc",
+                        "error": "#ba1a1a",
+                        "on-error-container": "#93000a",
+                        "primary-fixed-dim": "#c1c6d7",
+                        "on-secondary-fixed-variant": "#00497e",
+                        "surface-container-low": "#f3f4f5",
+                        "tertiary": "#010a0f",
+                        "inverse-on-surface": "#f0f1f2",
+                        "primary": "#030813",
+                        "secondary-fixed-dim": "#9fcaff",
+                        "on-surface": "#191c1d",
+                        "on-background": "#191c1d",
+                        "inverse-primary": "#c1c6d7",
+                        "on-primary": "#ffffff",
+                        "on-tertiary-fixed-variant": "#3c494e",
+                        "on-primary-container": "#828796",
+                        "on-tertiary-container": "#7d8a90",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary-fixed": "#d8e4eb",
+                        "surface-container-high": "#e7e8e9",
+                        "surface-container": "#edeeef",
+                        "on-surface-variant": "#45474c",
+                        "surface-variant": "#e1e3e4",
+                        "error-container": "#ffdad6",
+                        "on-secondary-fixed": "#001d37",
+                        "primary-fixed": "#dde2f3",
+                        "secondary-fixed": "#d2e4ff",
+                        "on-secondary-container": "#004172",
+                        "tertiary-fixed-dim": "#bcc8cf",
+                        "surface-tint": "#585e6c",
+                        "on-primary-fixed": "#161c27",
+                        "surface-dim": "#d9dadb",
+                        "tertiary-container": "#162227",
+                        "primary-container": "#1a202c",
+                        "surface-bright": "#f8f9fa",
+                        "inverse-surface": "#2e3132",
+                        "on-primary-fixed-variant": "#414754",
+                        "on-error": "#ffffff",
+                        "outline": "#76777c"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .font-manrope { font-family: 'Manrope', sans-serif; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-slate-50/80 backdrop-blur-xl no-border bg-gradient-to-b from-slate-100/50 to-transparent shadow-sm shadow-slate-200/20">
+<div class="flex justify-between items-center w-full px-6 py-4 max-w-screen-2xl mx-auto">
+<div class="text-2xl font-black text-slate-900 tracking-tighter font-manrope">Ante</div>
+<div class="hidden md:flex items-center space-x-8">
+<a class="text-slate-500 font-medium hover:text-slate-900 transition-colors duration-300 font-inter" href="#">Explore</a>
+<a class="text-slate-500 font-medium hover:text-slate-900 transition-colors duration-300 font-inter" href="#">How it Works</a>
+<a class="text-slate-500 font-medium hover:text-slate-900 transition-colors duration-300 font-inter" href="#">Leaderboard</a>
+</div>
+<button class="bg-primary text-on-primary px-6 py-2.5 rounded-lg font-manrope font-bold tracking-tight scale-95 active:opacity-80 transition-transform">
+                Connect Wallet
+            </button>
+</div>
+</nav>
+<main class="pt-24 pb-20 px-6 max-w-screen-2xl mx-auto min-h-screen">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+<!-- Left: Form Steps -->
+<div class="lg:col-span-8 space-y-12">
+<!-- Page Header -->
+<header class="space-y-2">
+<h1 class="text-5xl font-extrabold tracking-tight font-manrope text-primary">Initiate Bounty</h1>
+<p class="text-on-surface-variant font-inter text-lg max-w-xl">Configure a decentralized verification challenge. Secure your protocol through incentivized analysis.</p>
+</header>
+<!-- Stepper Progress -->
+<div class="flex items-center space-x-4">
+<div class="flex items-center space-x-2 text-primary font-bold">
+<span class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-sm">1</span>
+<span class="text-sm font-label uppercase tracking-widest">Select Type</span>
+</div>
+<div class="h-px w-8 bg-surface-container-highest"></div>
+<div class="flex items-center space-x-2 text-on-surface-variant opacity-40">
+<span class="w-8 h-8 rounded-full border border-outline-variant flex items-center justify-center text-sm">2</span>
+<span class="text-sm font-label uppercase tracking-widest">Technical</span>
+</div>
+<div class="h-px w-8 bg-surface-container-highest"></div>
+<div class="flex items-center space-x-2 text-on-surface-variant opacity-40">
+<span class="w-8 h-8 rounded-full border border-outline-variant flex items-center justify-center text-sm">3</span>
+<span class="text-sm font-label uppercase tracking-widest">Financials</span>
+</div>
+</div>
+<!-- Step 1: Bounty Type & Topic -->
+<section class="space-y-8">
+<div class="space-y-4">
+<h2 class="text-2xl font-bold font-manrope tracking-tight text-primary">Challenge Objective</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<!-- Selected Card -->
+<div class="p-6 rounded-xl bg-surface-container-lowest ring-1 ring-primary shadow-sm cursor-pointer group transition-all">
+<div class="flex justify-between items-start mb-6">
+<span class="material-symbols-outlined text-primary text-3xl" style="font-variation-settings: 'FILL' 1;">security</span>
+<div class="w-5 h-5 rounded-full border-4 border-primary bg-primary"></div>
+</div>
+<h3 class="text-lg font-bold font-manrope mb-2">Protocol Exploit</h3>
+<p class="text-sm text-on-surface-variant font-inter leading-relaxed">Verification of critical vulnerabilities in smart contract logic or economic security.</p>
+</div>
+<!-- Inactive Card -->
+<div class="p-6 rounded-xl bg-surface-container-low hover:bg-surface-container-highest cursor-pointer group transition-all">
+<div class="flex justify-between items-start mb-6">
+<span class="material-symbols-outlined text-on-surface-variant text-3xl">data_exploration</span>
+<div class="w-5 h-5 rounded-full border-2 border-outline-variant"></div>
+</div>
+<h3 class="text-lg font-bold font-manrope mb-2 text-on-surface-variant">Formal Proof</h3>
+<p class="text-sm text-on-surface-variant font-inter leading-relaxed opacity-60">Mathematic validation of protocol invariants or state transitions.</p>
+</div>
+</div>
+</div>
+<!-- Topic Selection -->
+<div class="space-y-4">
+<h3 class="text-label-md font-bold uppercase tracking-widest text-on-surface-variant">Primary Domain</h3>
+<div class="flex flex-wrap gap-3">
+<button class="px-5 py-2.5 rounded-full bg-primary text-on-primary text-sm font-semibold transition-colors">DeFi Protocol</button>
+<button class="px-5 py-2.5 rounded-full bg-surface-container-high hover:bg-surface-container-highest text-on-surface text-sm font-semibold transition-colors">Layer 2 Bridge</button>
+<button class="px-5 py-2.5 rounded-full bg-surface-container-high hover:bg-surface-container-highest text-on-surface text-sm font-semibold transition-colors">NFT Logic</button>
+<button class="px-5 py-2.5 rounded-full bg-surface-container-high hover:bg-surface-container-highest text-on-surface text-sm font-semibold transition-colors">Oracle Feeds</button>
+<button class="px-5 py-2.5 rounded-full bg-surface-container-high hover:bg-surface-container-highest text-on-surface text-sm font-semibold transition-colors">Governance</button>
+</div>
+</div>
+</section>
+<!-- Step 2: Technical Payload -->
+<section class="space-y-6 pt-12 border-t border-surface-container-low opacity-50 grayscale pointer-events-none">
+<h2 class="text-2xl font-bold font-manrope tracking-tight text-primary">Technical Verification</h2>
+<div class="space-y-4">
+<label class="block">
+<span class="text-sm font-bold text-on-surface-variant mb-2 block uppercase tracking-wider">Solution Hash (Keccak-256)</span>
+<div class="relative">
+<input class="w-full bg-surface-container-highest border-none rounded-lg p-4 font-mono text-sm focus:ring-1 focus:ring-primary focus:bg-surface-container-lowest transition-all" placeholder="0x..." type="text"/>
+<span class="absolute right-4 top-4 material-symbols-outlined text-outline">lock</span>
+</div>
+</label>
+<p class="text-xs text-on-surface-variant leading-normal">The encrypted payload ensuring the bounty remains immutable until the unlock condition is verified on-chain.</p>
+</div>
+</section>
+<!-- Actions -->
+<div class="flex items-center justify-between pt-12">
+<button class="text-primary font-bold px-4 py-2 hover:bg-surface-container-low rounded-lg transition-colors">Discard Draft</button>
+<button class="bg-primary text-on-primary px-10 py-4 rounded-xl font-manrope font-extrabold tracking-tight text-lg shadow-xl shadow-primary/10 hover:bg-primary-container transition-all">Continue to Technicals</button>
+</div>
+</div>
+<!-- Right: Summary Sidebar -->
+<aside class="lg:col-span-4 space-y-6">
+<div class="bg-surface-container-lowest p-8 rounded-2xl sticky top-24 shadow-sm">
+<h3 class="text-xl font-bold font-manrope mb-8 text-primary">Bounty Preview</h3>
+<div class="space-y-8">
+<div class="space-y-4">
+<div class="flex justify-between items-baseline">
+<span class="text-xs font-bold text-on-surface-variant uppercase tracking-widest">Type</span>
+<span class="text-sm font-semibold text-primary">Protocol Exploit</span>
+</div>
+<div class="flex justify-between items-baseline">
+<span class="text-xs font-bold text-on-surface-variant uppercase tracking-widest">Domain</span>
+<span class="text-sm font-semibold text-primary">DeFi Protocol</span>
+</div>
+</div>
+<div class="h-px bg-surface-container"></div>
+<div class="space-y-4">
+<div class="flex justify-between items-baseline">
+<span class="text-xs font-bold text-on-surface-variant uppercase tracking-widest">Status</span>
+<span class="flex items-center space-x-2 text-xs font-bold text-secondary px-2 py-1 rounded bg-secondary-fixed/30">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+<span>Drafting</span>
+</span>
+</div>
+</div>
+<div class="space-y-1">
+<span class="text-xs font-bold text-on-surface-variant uppercase tracking-widest">Estimated Deposit</span>
+<div class="flex items-baseline space-x-2">
+<span class="text-4xl font-extrabold font-manrope text-primary">0.00</span>
+<span class="text-lg font-bold text-on-surface-variant">ANTE</span>
+</div>
+</div>
+<div class="p-4 rounded-xl bg-surface-container-low border border-outline-variant/15 flex items-start space-x-3">
+<span class="material-symbols-outlined text-secondary text-lg">info</span>
+<p class="text-xs text-on-surface-variant leading-relaxed">Deposits are locked in the monolith vault for a minimum of 14 days before verification phase begins.</p>
+</div>
+</div>
+</div>
+<!-- Helper Card -->
+<div class="bg-secondary-fixed/10 p-6 rounded-2xl border border-secondary-fixed/20">
+<h4 class="text-sm font-bold text-on-secondary-fixed-variant mb-2">Need assistance?</h4>
+<p class="text-xs text-on-secondary-fixed leading-relaxed mb-4">Our curators can help you define the payload structure to ensure maximum security.</p>
+<a class="text-xs font-bold text-secondary underline decoration-secondary/30 underline-offset-4" href="#">View Documentation</a>
+</div>
+</aside>
+</div>
+</main>
+<!-- Footer -->
+<footer class="w-full py-12 bg-slate-50 dark:bg-slate-900/50">
+<div class="flex flex-col md:flex-row justify-between items-center px-8 max-w-7xl mx-auto font-inter text-sm tracking-wide text-slate-600 dark:text-slate-400">
+<p class="">© 2024 Ante. Built on the Monolith.</p>
+<div class="flex space-x-8 mt-6 md:mt-0">
+<a class="hover:text-slate-900 dark:hover:text-white underline-offset-4 hover:underline transition-opacity" href="#">Docs</a>
+<a class="hover:text-slate-900 dark:hover:text-white underline-offset-4 hover:underline transition-opacity" href="#">Discord</a>
+<a class="hover:text-slate-900 dark:hover:text-white underline-offset-4 hover:underline transition-opacity" href="#">Status</a>
+</div>
+</div>
+</footer>
+</body></html>

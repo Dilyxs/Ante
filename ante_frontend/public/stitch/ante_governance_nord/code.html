@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Governance - Ante Monolith</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-container": "#66affe",
+                        "on-tertiary": "#ffffff",
+                        "surface": "#f8f9fa",
+                        "on-tertiary-fixed-variant": "#3c494e",
+                        "on-primary-fixed-variant": "#414754",
+                        "outline": "#76777c",
+                        "surface-container-highest": "#e1e3e4",
+                        "inverse-on-surface": "#f0f1f2",
+                        "on-secondary-fixed-variant": "#00497e",
+                        "surface-container-lowest": "#ffffff",
+                        "primary-fixed": "#dde2f3",
+                        "on-primary-fixed": "#161c27",
+                        "inverse-primary": "#c1c6d7",
+                        "on-tertiary-container": "#7d8a90",
+                        "surface-variant": "#e1e3e4",
+                        "inverse-surface": "#2e3132",
+                        "background": "#f8f9fa",
+                        "surface-dim": "#d9dadb",
+                        "outline-variant": "#c6c6cc",
+                        "surface-bright": "#f8f9fa",
+                        "tertiary-container": "#162227",
+                        "error": "#ba1a1a",
+                        "secondary-fixed-dim": "#9fcaff",
+                        "on-error-container": "#93000a",
+                        "on-error": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "on-tertiary-fixed": "#111d22",
+                        "on-surface-variant": "#45474c",
+                        "on-surface": "#191c1d",
+                        "primary-fixed-dim": "#c1c6d7",
+                        "on-secondary-fixed": "#001d37",
+                        "surface-container-low": "#f3f4f5",
+                        "primary": "#030813",
+                        "on-secondary": "#ffffff",
+                        "on-background": "#191c1d",
+                        "tertiary-fixed": "#d8e4eb",
+                        "surface-container-high": "#e7e8e9",
+                        "error-container": "#ffdad6",
+                        "secondary-fixed": "#d2e4ff",
+                        "tertiary-fixed-dim": "#bcc8cf",
+                        "primary-container": "#1a202c",
+                        "tertiary": "#010a0f",
+                        "surface-tint": "#585e6c",
+                        "on-secondary-container": "#004172",
+                        "secondary": "#0061a5",
+                        "on-primary-container": "#828796",
+                        "surface-container": "#edeeef"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3 { font-family: 'Manrope', sans-serif; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface">
+<!-- TopAppBar (App Type) -->
+<nav class="fixed top-0 w-full z-50 flex justify-between items-center px-6 py-3 bg-[#ffffff]/80 dark:bg-[#1a202c]/80 backdrop-blur-xl shadow-[0_20px_60px_rgba(25,28,29,0.04)]">
+<div class="flex items-center gap-8">
+<span class="text-xl font-black tracking-tight text-[#030813] dark:text-[#ffffff]">Ante</span>
+<div class="hidden md:flex gap-6 items-center">
+<a class="text-[#45474c] dark:text-[#c6c6cc] hover:bg-[#f3f4f5] dark:hover:bg-[#030813] px-3 py-1 rounded-lg transition-opacity opacity-80 hover:opacity-100" href="#">Feed</a>
+<a class="text-[#45474c] dark:text-[#c6c6cc] hover:bg-[#f3f4f5] dark:hover:bg-[#030813] px-3 py-1 rounded-lg transition-opacity opacity-80 hover:opacity-100" href="#">Create Bounty</a>
+<a class="text-[#030813] dark:text-[#ffffff] font-semibold border-b-2 border-[#030813] px-3 py-1" href="#">Governance</a>
+<a class="text-[#45474c] dark:text-[#c6c6cc] hover:bg-[#f3f4f5] dark:hover:bg-[#030813] px-3 py-1 rounded-lg transition-opacity opacity-80 hover:opacity-100" href="#">My Dashboard</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-[#45474c] dark:text-[#c6c6cc] hover:text-primary transition-colors">account_balance_wallet</button>
+<button class="material-symbols-outlined text-[#45474c] dark:text-[#c6c6cc] hover:text-primary transition-colors">notifications</button>
+<div class="w-8 h-8 rounded-full bg-surface-container-highest overflow-hidden">
+<img alt="User Wallet Avatar" class="w-full h-full object-cover" data-alt="Abstract geometric art with soft blue and white gradients, minimalist crypto wallet avatar style" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAcVpGAwO_or4LyCeHh5wRd-SvYex3cfcP0M7vrjdGxAEKcO2kJmIK6v-dhzOXDGgX42LjSNnJHZMaBKe23oRBKdRnAcmiNMq27Hmm4n2SYdqcIRzAlGvEG0t1ZF-PaGUrH2psN7GENrg94IGYrZ2nPCM8D9MGquqEfBcZIrOthphFGtByXmyP-T3MGFspRcj7BxCp3HjjhUZiOGSh7JraXuoe9tRzVQZ-J-UknurANZIRjeU3-wgbUmigh3bruipgke32Ys7tYXA0p"/>
+</div>
+</div>
+</nav>
+<main class="pt-24 pb-20 px-6 max-w-7xl mx-auto">
+<!-- Header & Stats Section -->
+<header class="mb-12">
+<h1 class="text-5xl font-extrabold tracking-tight text-primary mb-4">Governance</h1>
+<p class="text-on-surface-variant max-w-2xl text-lg mb-8">Decide the future of the Arctic protocols. Vote on pending bounties and shapes the ecosystem's trajectory through collective consensus.</p>
+<!-- Voting Weight Bento Box -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="md:col-span-2 bg-surface-container-lowest p-8 rounded-xl shadow-[0_20px_40px_rgba(25,28,29,0.04)] flex flex-col justify-between">
+<div>
+<span class="text-sm font-label uppercase tracking-wider text-on-surface-variant">Your Voting Weight</span>
+<div class="flex items-baseline gap-2 mt-2">
+<span class="text-4xl font-bold text-primary">12,450.82</span>
+<span class="text-lg font-semibold text-secondary">vANTE</span>
+</div>
+</div>
+<div class="mt-8 flex gap-4 items-center">
+<div class="h-2 flex-grow bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-secondary w-2/3"></div>
+</div>
+<span class="text-sm text-on-surface-variant font-medium">Top 5% of Holders</span>
+</div>
+</div>
+<div class="bg-primary text-on-primary p-8 rounded-xl flex flex-col justify-center items-center text-center">
+<span class="material-symbols-outlined text-4xl mb-4" data-weight="fill" style="font-variation-settings: 'FILL' 1;">account_balance</span>
+<h3 class="text-xl font-bold mb-2">Stake to Vote</h3>
+<p class="text-sm text-on-primary-container mb-6">Increase your influence by locking ANTE tokens in the vault.</p>
+<button class="bg-secondary-container text-on-secondary-container font-semibold py-2 px-6 rounded-lg hover:brightness-110 transition-all">Manage Stake</button>
+</div>
+</div>
+</header>
+<!-- Main Content Area: Asymmetric Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+<!-- Pending Proposals (Primary Focus) -->
+<div class="lg:col-span-8 space-y-6">
+<div class="flex items-center justify-between mb-2">
+<h2 class="text-2xl font-bold text-primary">Active Proposals</h2>
+<span class="px-3 py-1 bg-secondary-container/20 text-on-secondary-container text-xs font-bold rounded-full uppercase tracking-tighter">3 Ending Soon</span>
+</div>
+<!-- Proposal Card 1 -->
+<div class="group bg-surface-container-lowest p-6 rounded-xl hover:shadow-[0_10px_30px_rgba(0,0,0,0.05)] transition-all">
+<div class="flex justify-between items-start mb-4">
+<div class="flex gap-3 items-center">
+<span class="w-10 h-10 rounded-lg bg-surface-container-high flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">code</span>
+</span>
+<div>
+<h3 class="font-bold text-lg text-primary">Optimize Gas for Arctic-L2 Bridge</h3>
+<p class="text-xs text-on-surface-variant">Posted by <span class="text-secondary">0x7a...4b21</span> • 2 days left</p>
+</div>
+</div>
+<span class="bg-surface-container-high text-on-surface-variant text-[10px] font-bold px-2 py-1 rounded">PROPOSAL #442</span>
+</div>
+<p class="text-on-surface-variant text-sm mb-6 leading-relaxed">This bounty seeks the most efficient implementation of the L2 cross-chain messaging system to reduce overhead by 15%.</p>
+<div class="flex items-center gap-4 mb-6">
+<div class="flex-grow">
+<div class="flex justify-between text-xs mb-1 font-medium">
+<span>Support</span>
+<span>82%</span>
+</div>
+<div class="h-1.5 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-secondary w-[82%]"></div>
+</div>
+</div>
+<button class="bg-primary text-on-primary text-sm font-semibold px-6 py-2 rounded-lg hover:bg-primary-container transition-colors">Vote Now</button>
+</div>
+<div class="pt-4 flex items-center justify-between">
+<div class="flex -space-x-2">
+<img alt="voter" class="w-6 h-6 rounded-full ring-2 ring-surface-container-lowest" data-alt="User avatar 1 small circle" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCMRbyS0cDg7SVeFk-eQ8SF9GaQzLaKnNJ8vPyfaxYZ_WK76jex0fZzE0FNCh1zeJDDBcskRWTLUWspx8CSqJvw0qlhpBzcgBvzaiseJaWnhGV-DRLC7z16tSZN3Ndg-KiowQHWKRVvyNnyL9Gl52SH_uuhY1e7q8rBBRoN2hmfsF9b-TZ_HgKx_NIocbSrr1syvwi3xSqqRLBddT2EgW72WlYH-ePKreuClTci706cObwMPe7vckGajJEDFGKM0Z6lKfePR3ziYat-"/>
+<img alt="voter" class="w-6 h-6 rounded-full ring-2 ring-surface-container-lowest" data-alt="User avatar 2 small circle" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC1iLdNdI46GF55oMgC29GXd5SSl0Agft6wejeynHIqKfnWaYjIpbik9hifYlF5CLrmQIqsaXRbYMjkPSQc47P_wQYZ2WuHHd-ZeREIAZdmrqVUwzYgJKdSE1Lao0ktSdCQSLM0nz-ypIs7vHWIbI5Hy5DTFeP4osnl3QQuSVWgxW8S9e-20jmxkvaB2b06a7wthW1MzS6nxQxQomKubtD6bw9xLoIPKr4EBDTGMHmHYIE2TUBAnPTGjfiS1SsNJztlYFYg3QyhxUoI"/>
+<img alt="voter" class="w-6 h-6 rounded-full ring-2 ring-surface-container-lowest" data-alt="User avatar 3 small circle" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBCozy5hcGOdhz6TuV2_IrakfpKde_96Tc9afTX8Dqxd-u_Mb7WnK2HZiISJgIXYyUZiAhXnmi9Dhomzg0YEopLsDLzMjoQpOoR6qXT9WbB2ETJqFwxj3Q2-NhULpnl2NRdxo-kRg9aldAcyssqX5ls3IqiXN6iY68cbsDqQ_jbT4kFtj11ZMIeGYL_6gicvCNKV_nddGeqbJNWX98-fqWK6pb7Z8MbFL5hu9vOpd7F6_5oNlqCiBZjZpIq4Z18SJktvF9slXrf7QAb"/>
+<div class="w-6 h-6 rounded-full ring-2 ring-surface-container-lowest bg-surface-container text-[8px] flex items-center justify-center font-bold text-on-surface-variant">+42</div>
+</div>
+<div class="flex gap-4 text-xs text-on-surface-variant font-medium">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">forum</span> 12 Comments</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">analytics</span> 1.2M vANTE Total</span>
+</div>
+</div>
+</div>
+<!-- Proposal Card 2 -->
+<div class="group bg-surface-container-lowest p-6 rounded-xl hover:shadow-[0_10px_30px_rgba(0,0,0,0.05)] transition-all">
+<div class="flex justify-between items-start mb-4">
+<div class="flex gap-3 items-center">
+<span class="w-10 h-10 rounded-lg bg-surface-container-high flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">palette</span>
+</span>
+<div>
+<h3 class="font-bold text-lg text-primary">Redesign Protocol Logo Assets</h3>
+<p class="text-xs text-on-surface-variant">Posted by <span class="text-secondary">0x21...ff89</span> • 5 days left</p>
+</div>
+</div>
+<span class="bg-surface-container-high text-on-surface-variant text-[10px] font-bold px-2 py-1 rounded">PROPOSAL #441</span>
+</div>
+<p class="text-on-surface-variant text-sm mb-6 leading-relaxed">Updating the brand identity to align with the "Arctic Monolith" design system across all social channels and documentation.</p>
+<div class="flex items-center gap-4 mb-6">
+<div class="flex-grow">
+<div class="flex justify-between text-xs mb-1 font-medium">
+<span>Support</span>
+<span>45%</span>
+</div>
+<div class="h-1.5 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-secondary w-[45%]"></div>
+</div>
+</div>
+<button class="bg-primary text-on-primary text-sm font-semibold px-6 py-2 rounded-lg hover:bg-primary-container transition-colors">Vote Now</button>
+</div>
+<div class="pt-4 flex items-center justify-between">
+<div class="flex -space-x-2">
+<img alt="voter" class="w-6 h-6 rounded-full ring-2 ring-surface-container-lowest" data-alt="User avatar 4 small circle" src="https://lh3.googleusercontent.com/aida-public/AB6AXuChqvuzA9a3mb5bPrELnDeaV5xFmnwzGfpW9CHH9lKlN1UFl9phtpahX5komeWixdnNG7nzEbyizqtiSvdGmimSzgG3VqcokWS5wceEUk_J6Dvbdf-IXa5GuTZ_uUcnlonWHpc7duIrL7FruASqRWgdjIymk0q5ldNyLcT2GZ1p1-MYPFTWQjJCOOOMealdnrGAjSqkaEZFhtXjE1BsQR75WZSAKtd-JV3TCc4ceNEE0pRaNHpY20aO1Vv032CsPy36M64ARXSzxJkx"/>
+<img alt="voter" class="w-6 h-6 rounded-full ring-2 ring-surface-container-lowest" data-alt="User avatar 5 small circle" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAWM2ratHMiQ6n1QBcg-thw-FnbaK-lSfX6MOCJbp4lwm4CsfBBgIbki7-CgtUXlBTpXVqnKknJ9oXsbuftlfqClQ3f4CyRK1zyjGJXXlaE8WIPykGv-FU6VfT7XfNQ498DLKuba6xaH-9I17Pv2aW0LFkaBgP9dfc2gjWJ10LPA5s1cxO3Bs_unkhF85I3aRWT0s3ii5d9QF_wpOcoF6yK9dgGeWbSb6NzqyfLaCkD29rhv0Ty4aMyO_xQ3iMkqB7IsAWjSCxzAiyv"/>
+<div class="w-6 h-6 rounded-full ring-2 ring-surface-container-lowest bg-surface-container text-[8px] flex items-center justify-center font-bold text-on-surface-variant">+8</div>
+</div>
+<div class="flex gap-4 text-xs text-on-surface-variant font-medium">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">forum</span> 5 Comments</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">analytics</span> 480k vANTE Total</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Side Rail: Discussions & History -->
+<aside class="lg:col-span-4 space-y-8">
+<!-- Live Discussions -->
+<section>
+<h2 class="text-xl font-bold text-primary mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary">bubble_chart</span>
+                        Active Discussions
+                    </h2>
+<div class="bg-surface-container-low rounded-xl p-6 space-y-6">
+<div class="relative pl-6 border-l-2 border-secondary-container">
+<span class="text-[10px] font-bold text-secondary uppercase block mb-1">#442 Gas Optimization</span>
+<p class="text-sm text-on-surface leading-snug italic">"The submitted solution by DevX reduces SLOAD operations by 30%. Clear winner."</p>
+<span class="text-[10px] text-on-surface-variant mt-2 block">— winter_owl.eth</span>
+</div>
+<div class="relative pl-6 border-l-2 border-surface-container-high">
+<span class="text-[10px] font-bold text-on-surface-variant uppercase block mb-1">#441 Logo Redesign</span>
+<p class="text-sm text-on-surface leading-snug">"Wait, do we really need a rebrand now? I'd rather focus on the yield farm v3."</p>
+<span class="text-[10px] text-on-surface-variant mt-2 block">— glacial_yield</span>
+</div>
+<button class="w-full text-center py-2 text-xs font-bold text-primary border border-primary/10 rounded-lg hover:bg-surface-container-high transition-colors">View All Discussions</button>
+</div>
+</section>
+<!-- History Section -->
+<section>
+<h2 class="text-xl font-bold text-primary mb-4">Governance History</h2>
+<div class="space-y-3">
+<div class="flex items-center justify-between p-4 bg-surface-container-lowest rounded-lg">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-green-600 text-sm">check_circle</span>
+<span class="text-sm font-medium">Proposal #440</span>
+</div>
+<span class="text-[10px] font-bold text-on-surface-variant bg-surface-container px-2 py-0.5 rounded">PASSED</span>
+</div>
+<div class="flex items-center justify-between p-4 bg-surface-container-lowest rounded-lg">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-red-600 text-sm">cancel</span>
+<span class="text-sm font-medium">Proposal #439</span>
+</div>
+<span class="text-[10px] font-bold text-on-surface-variant bg-surface-container px-2 py-0.5 rounded">REJECTED</span>
+</div>
+<div class="flex items-center justify-between p-4 bg-surface-container-lowest rounded-lg opacity-60">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-green-600 text-sm">check_circle</span>
+<span class="text-sm font-medium">Proposal #438</span>
+</div>
+<span class="text-[10px] font-bold text-on-surface-variant bg-surface-container px-2 py-0.5 rounded">PASSED</span>
+</div>
+</div>
+<a class="inline-block mt-4 text-xs font-bold text-secondary hover:underline" href="#">Explore full archives →</a>
+</section>
+</aside></div>
+</main>
+<!-- Footer -->
+<footer class="w-full py-12 px-8 flex flex-col md:flex-row justify-between items-center gap-6 bg-[#f3f4f5] dark:bg-[#030813]">
+<div class="flex flex-col items-center md:items-start gap-2">
+<span class="text-lg font-bold text-[#030813] dark:text-[#f8f9fa]">Ante</span>
+<p class="text-[#45474c] dark:text-[#c6c6cc] text-[10px] uppercase tracking-wider font-label">© 2024 Ante Monolith. Built for the Arctic.</p>
+</div>
+<div class="flex gap-8">
+<a class="text-[#45474c] dark:text-[#c6c6cc] text-xs font-label uppercase tracking-widest hover:text-[#66affe] transition-colors" href="#">Privacy Policy</a>
+<a class="text-[#45474c] dark:text-[#c6c6cc] text-xs font-label uppercase tracking-widest hover:text-[#66affe] transition-colors" href="#">Terms of Service</a>
+<a class="text-[#45474c] dark:text-[#c6c6cc] text-xs font-label uppercase tracking-widest hover:text-[#66affe] transition-colors" href="#">Security</a>
+<a class="text-[#45474c] dark:text-[#c6c6cc] text-xs font-label uppercase tracking-widest hover:text-[#66affe] transition-colors" href="#">Docs</a>
+</div>
+</footer>
+</body></html>

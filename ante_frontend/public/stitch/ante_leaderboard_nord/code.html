@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Ante | Leaderboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&amp;family=Inter:wght@100..900&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                "on-tertiary": "#ffffff",
+                "secondary-container": "#66affe",
+                "surface": "#f8f9fa",
+                "surface-container-highest": "#e1e3e4",
+                "secondary": "#0061a5",
+                "on-secondary": "#ffffff",
+                "background": "#f8f9fa",
+                "on-tertiary-fixed": "#111d22",
+                "outline-variant": "#c6c6cc",
+                "error": "#ba1a1a",
+                "on-error-container": "#93000a",
+                "primary-fixed-dim": "#c1c6d7",
+                "on-secondary-fixed-variant": "#00497e",
+                "surface-container-low": "#f3f4f5",
+                "tertiary": "#010a0f",
+                "inverse-on-surface": "#f0f1f2",
+                "primary": "#030813",
+                "secondary-fixed-dim": "#9fcaff",
+                "on-surface": "#191c1d",
+                "on-background": "#191c1d",
+                "inverse-primary": "#c1c6d7",
+                "on-primary": "#ffffff",
+                "on-tertiary-fixed-variant": "#3c494e",
+                "on-primary-container": "#828796",
+                "on-tertiary-container": "#7d8a90",
+                "surface-container-lowest": "#ffffff",
+                "tertiary-fixed": "#d8e4eb",
+                "surface-container-high": "#e7e8e9",
+                "surface-container": "#edeeef",
+                "on-surface-variant": "#45474c",
+                "surface-variant": "#e1e3e4",
+                "error-container": "#ffdad6",
+                "on-secondary-fixed": "#001d37",
+                "primary-fixed": "#dde2f3",
+                "secondary-fixed": "#d2e4ff",
+                "on-secondary-container": "#004172",
+                "tertiary-fixed-dim": "#bcc8cf",
+                "surface-tint": "#585e6c",
+                "on-primary-fixed": "#161c27",
+                "surface-dim": "#d9dadb",
+                "tertiary-container": "#162227",
+                "primary-container": "#1a202c",
+                "surface-bright": "#f8f9fa",
+                "inverse-surface": "#2e3132",
+                "on-primary-fixed-variant": "#414754",
+                "on-error": "#ffffff",
+                "outline": "#76777c"
+            },
+            "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "1rem",
+                "xl": "1.25rem",
+                "full": "9999px"
+            },
+            "fontFamily": {
+                "headline": ["Manrope"],
+                "body": ["Inter"],
+                "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .font-manrope { font-family: 'Manrope', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .arctic-blur {
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        /* The No-Line Rule: boundaries through background color shifts */
+        .tonal-proximity-card {
+            background-color: #ffffff;
+            transition: background-color 0.3s ease;
+        }
+        .tonal-proximity-card:hover {
+            background-color: #f3f4f5;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface selection:bg-secondary-container selection:text-on-secondary-container">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-xl shadow-sm shadow-slate-200/20 no-border bg-gradient-to-b from-slate-100/50 to-transparent">
+<div class="flex justify-between items-center w-full px-6 py-4 max-w-screen-2xl mx-auto font-manrope font-bold tracking-tight text-slate-900 dark:text-slate-50">
+<div class="text-2xl font-black text-slate-900 dark:text-slate-50 tracking-tighter">Ante</div>
+<div class="hidden md:flex gap-8 items-center">
+<a class="text-slate-500 dark:text-slate-400 font-medium hover:text-slate-900 dark:hover:text-white transition-colors duration-300" href="#">Explore</a>
+<a class="text-slate-500 dark:text-slate-400 font-medium hover:text-slate-900 dark:hover:text-white transition-colors duration-300" href="#">How it Works</a>
+<a class="text-slate-900 dark:text-white font-extrabold border-b-2 border-slate-900 dark:border-white pb-1" href="#">Leaderboard</a>
+</div>
+<div class="flex items-center gap-4">
+<button class="bg-primary text-on-primary px-6 py-2.5 rounded-lg text-sm font-bold scale-95 active:opacity-80 transition-transform hover:bg-primary-container transition-colors duration-300">
+                    Connect Wallet
+                </button>
+</div>
+</div>
+</nav>
+<main class="pt-32 pb-24 px-6 max-w-screen-2xl mx-auto">
+<!-- Hero Section / Header -->
+<header class="mb-16">
+<h1 class="text-6xl md:text-7xl font-headline font-extrabold tracking-tighter text-primary mb-4">
+                The Monolith <br/>
+<span class="text-on-primary-container">Leaderboard</span>
+</h1>
+<p class="text-lg text-on-surface-variant max-w-2xl font-body leading-relaxed">
+                Celebrating the most precise hunters and meticulous posters in the ecosystem. Data integrity carved in glass.
+            </p>
+</header>
+<!-- Bento Filter & Quick Stats -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-6 mb-12">
+<div class="md:col-span-8 bg-surface-container-low p-8 rounded-xl flex flex-col justify-between">
+<div>
+<h2 class="text-label-md font-bold uppercase tracking-widest text-on-surface-variant mb-6">Filter by Domain</h2>
+<div class="flex flex-wrap gap-3">
+<button class="bg-primary text-on-primary px-5 py-2 rounded-full text-sm font-semibold">Global</button>
+<button class="bg-surface-container-lowest text-on-surface-variant hover:text-primary px-5 py-2 rounded-full text-sm font-semibold transition-colors">Financial Systems</button>
+<button class="bg-surface-container-lowest text-on-surface-variant hover:text-primary px-5 py-2 rounded-full text-sm font-semibold transition-colors">Geopolitical</button>
+<button class="bg-surface-container-lowest text-on-surface-variant hover:text-primary px-5 py-2 rounded-full text-sm font-semibold transition-colors">Social Trends</button>
+<button class="bg-surface-container-lowest text-on-surface-variant hover:text-primary px-5 py-2 rounded-full text-sm font-semibold transition-colors">Technology</button>
+</div>
+</div>
+<div class="mt-8 flex gap-12">
+<div>
+<span class="block text-2xl font-headline font-bold text-primary">2,491</span>
+<span class="text-xs font-medium text-on-surface-variant uppercase tracking-tighter">Active Hunters</span>
+</div>
+<div>
+<span class="block text-2xl font-headline font-bold text-primary">94.2%</span>
+<span class="text-xs font-medium text-on-surface-variant uppercase tracking-tighter">Avg. Accuracy</span>
+</div>
+</div>
+</div>
+<div class="md:col-span-4 bg-primary text-on-primary p-8 rounded-xl flex flex-col justify-center items-center text-center relative overflow-hidden group">
+<div class="relative z-10">
+<span class="material-symbols-outlined text-4xl mb-4 text-secondary-container">workspace_premium</span>
+<h3 class="text-xl font-headline font-bold mb-2">Weekly Champion</h3>
+<div class="w-16 h-16 rounded-full mx-auto mb-3 border-2 border-secondary-container p-1">
+<img alt="User Avatar" class="w-full h-full rounded-full object-cover" data-alt="Portrait of a young professional with clean lighting and neutral studio background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCmtriscrSeGf7UpQQan4v72MpB_C4Nf65RDJf-xIoPQ1Ofa_kpB7LlMRGDZGmsDQlivmakitj2PVxv5CWFg7HoiAJVomej2FEqB44a7cy4aw6d2cp7mK5SWjokiMiF4JFRsvgE2Tiif5ETiCAEpfw3LIMymjZHbIOnObLYAuoB2sJzf6SMWDjO1ecy2jSJ-mRpVNrtVDy10lFWhb3FKE9UysuQFtD8czyNkjIot91SJBnbs0DFGqGtO37gagw3Pty83ZXlW3XspxX6"/>
+</div>
+<p class="font-bold text-lg">0xAegis_V</p>
+<p class="text-on-primary-container text-sm">+2,400 RP this week</p>
+</div>
+<!-- Subtle Gradient Pattern -->
+<div class="absolute inset-0 bg-gradient-to-br from-primary via-primary-container to-primary opacity-50"></div>
+</div>
+</div>
+<!-- Leaderboard Table: "The Ledger Glass" -->
+<div class="bg-surface-container-lowest rounded-xl shadow-sm shadow-slate-200/10 overflow-hidden">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low text-on-surface-variant text-xs uppercase tracking-widest font-bold">
+<th class="px-8 py-5">Rank</th>
+<th class="px-8 py-5">Hunter</th>
+<th class="px-8 py-5">Accuracy</th>
+<th class="px-8 py-5">History</th>
+<th class="px-8 py-5 text-right">Reputation Score</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-transparent">
+<!-- Row 1 (Top) -->
+<tr class="tonal-proximity-card group cursor-pointer border-l-4 border-secondary-container">
+<td class="px-8 py-6 font-headline font-bold text-xl text-primary">01</td>
+<td class="px-8 py-6">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-surface-container-highest overflow-hidden">
+<img alt="Avatar" class="w-full h-full object-cover" data-alt="A minimal profile icon with soft gradient and stylized letter A" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAhlnR7U4Ytm9BVGcYVBsPKc0pkA960AJKOfkSzzUddnAWv3n9EQAR1MvAqy45yLZieW1e8pdPtk0O270eMkJnMwVC2cScY5wPDKG_xCDKua4NT4I1ndYDadZEqrs2G5barb4Dd7cImVWcmg9EAumtSg2S9MiKPcOJYpSIHaMNFihwnK0vx3PLYbcOldY8Md2LVjjOxN1ES7ETn8bdx9fYkV1k4EPuWLLQoL3HqtZqfPMbpf-NeVnnXc2Ypb40n1DpvXF174N5YDDVL"/>
+</div>
+<div>
+<span class="block font-bold text-primary">EtherOracle</span>
+<span class="text-xs text-on-surface-variant">Joined Feb 2024</span>
+</div>
+</div>
+</td>
+<td class="px-8 py-6">
+<div class="flex items-center gap-2">
+<div class="w-16 h-1.5 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-secondary-container w-[98%]"></div>
+</div>
+<span class="text-sm font-bold text-primary">98.4%</span>
+</div>
+</td>
+<td class="px-8 py-6">
+<div class="flex gap-1">
+<div class="w-1.5 h-4 bg-secondary-container/40 rounded-sm"></div>
+<div class="w-1.5 h-6 bg-secondary-container rounded-sm"></div>
+<div class="w-1.5 h-3 bg-secondary-container/60 rounded-sm"></div>
+<div class="w-1.5 h-5 bg-secondary-container/80 rounded-sm"></div>
+<div class="w-1.5 h-7 bg-secondary-container rounded-sm"></div>
+</div>
+</td>
+<td class="px-8 py-6 text-right">
+<span class="font-headline font-bold text-primary">12,840</span>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="tonal-proximity-card group cursor-pointer border-l-4 border-transparent">
+<td class="px-8 py-6 font-headline font-bold text-xl text-primary">02</td>
+<td class="px-8 py-6">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-surface-container-highest overflow-hidden">
+<img alt="Avatar" class="w-full h-full object-cover" data-alt="Geometric minimalist graphic design in shades of blue and slate gray" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD1ztKNEgc2yzF8WmAz471Q4gw24gk0AUtiYhopRGgWUrtIUYuu_VNc3ZPaJLRoOpam247F5Hc5dHULAxJKvxO-lKzwCe_06kqtb2Ka1_bIERHB_1169VvLvu03weJ6Uo96_d2IYwsZ1rviSDgS_vOsjGeT3VP01AidXUR5o_x8IgpewIV7GIjwWTDKEQJPu_WZchibnx8lmU5XWat8PfsYONsaUrAzEOeH03kbP7IDrSA6mqYuC2bYNCe1Xq3gtMoY4AGddeopyAVe"/>
+</div>
+<div>
+<span class="block font-bold text-primary">NullPointer_</span>
+<span class="text-xs text-on-surface-variant">Joined Jan 2024</span>
+</div>
+</div>
+</td>
+<td class="px-8 py-6">
+<div class="flex items-center gap-2">
+<div class="w-16 h-1.5 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-secondary-container w-[95%]"></div>
+</div>
+<span class="text-sm font-bold text-primary">95.2%</span>
+</div>
+</td>
+<td class="px-8 py-6">
+<div class="flex gap-1 text-on-surface-variant/20">
+<div class="w-1.5 h-7 bg-secondary-container rounded-sm"></div>
+<div class="w-1.5 h-6 bg-secondary-container rounded-sm"></div>
+<div class="w-1.5 h-5 bg-secondary-container/80 rounded-sm"></div>
+<div class="w-1.5 h-4 bg-secondary-container/40 rounded-sm"></div>
+<div class="w-1.5 h-6 bg-secondary-container rounded-sm"></div>
+</div>
+</td>
+<td class="px-8 py-6 text-right">
+<span class="font-headline font-bold text-primary">11,201</span>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="tonal-proximity-card group cursor-pointer border-l-4 border-transparent">
+<td class="px-8 py-6 font-headline font-bold text-xl text-primary">03</td>
+<td class="px-8 py-6">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-surface-container-highest overflow-hidden">
+<img alt="Avatar" class="w-full h-full object-cover" data-alt="Macro photo of frozen crystalline structures with soft focus and cold lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAvtH8vD8WHH7M8nRKE1taAJcn8pFUofmf9Z4nqEUOHSeBNupzP8g5ZkfQuQUT6iT31rC9i8KMUIdQAEADSjioTiTmcUxo4dHyPRMB6Afrf_sK_PeFuzzussRv_Rl31U28e6t1ZMpJusSNxILH3cO9eSuLdNkRsXHqyR7etkFNR80Dq8kWLU84YimLPDLmpSKfBj_gW8i2Zh-jyxlleJpNWPaxVj5F2HFBhVwC64GJZ4EE1Y28e4Nf0V3yxUeasjtXI6qlio4XFj33X"/>
+</div>
+<div>
+<span class="block font-bold text-primary">Crypto_Scribe</span>
+<span class="text-xs text-on-surface-variant">Joined Mar 2024</span>
+</div>
+</div>
+</td>
+<td class="px-8 py-6">
+<div class="flex items-center gap-2">
+<div class="w-16 h-1.5 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-secondary-container w-[92%]"></div>
+</div>
+<span class="text-sm font-bold text-primary">92.8%</span>
+</div>
+</td>
+<td class="px-8 py-6">
+<div class="flex gap-1 text-on-surface-variant/20">
+<div class="w-1.5 h-3 bg-secondary-container/30 rounded-sm"></div>
+<div class="w-1.5 h-4 bg-secondary-container/40 rounded-sm"></div>
+<div class="w-1.5 h-6 bg-secondary-container rounded-sm"></div>
+<div class="w-1.5 h-7 bg-secondary-container rounded-sm"></div>
+<div class="w-1.5 h-5 bg-secondary-container/80 rounded-sm"></div>
+</div>
+</td>
+<td class="px-8 py-6 text-right">
+<span class="font-headline font-bold text-primary">9,450</span>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="tonal-proximity-card group cursor-pointer border-l-4 border-transparent">
+<td class="px-8 py-6 font-headline font-bold text-xl text-primary">04</td>
+<td class="px-8 py-6">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-surface-container-highest overflow-hidden">
+<img alt="Avatar" class="w-full h-full object-cover" data-alt="Abstract fluid texture with ink-like swirls in dark navy and white" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBqQEk_Q_yQCyhqX_mY8CCfYhJWzdYq8X8nhD-d-3HdgXs9q_H480mtGFSkaLbTzri1LuXkz_RnRxF4NAkZt8U_8hyFn4bg50nllFQY-CzELRwHRT-PF8wR6aabq4yCBnjJK6tZcfL_S2nSiFRGXC7sW5c2iZk9PKYR1XFX3jzU2unbqpRTd6oT3QX6mxKgEZnPeVHashka_Gb_ZLPvrktINyP5epgzLBkRM-VuPaf8KuMKgeJq83Rx1QAcJTQQhi-_M0m5G4Y5Oels"/>
+</div>
+<div>
+<span class="block font-bold text-primary">Delta_Force</span>
+<span class="text-xs text-on-surface-variant">Joined Dec 2023</span>
+</div>
+</div>
+</td>
+<td class="px-8 py-6">
+<div class="flex items-center gap-2">
+<div class="w-16 h-1.5 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-secondary-container w-[89%]"></div>
+</div>
+<span class="text-sm font-bold text-primary">89.1%</span>
+</div>
+</td>
+<td class="px-8 py-6">
+<div class="flex gap-1">
+<div class="w-1.5 h-5 bg-secondary-container/80 rounded-sm"></div>
+<div class="w-1.5 h-7 bg-secondary-container rounded-sm"></div>
+<div class="w-1.5 h-4 bg-secondary-container/40 rounded-sm"></div>
+<div class="w-1.5 h-3 bg-secondary-container/30 rounded-sm"></div>
+<div class="w-1.5 h-2 bg-secondary-container/20 rounded-sm"></div>
+</div>
+</td>
+<td class="px-8 py-6 text-right">
+<span class="font-headline font-bold text-primary">8,112</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="p-8 bg-surface-container-low flex justify-between items-center">
+<p class="text-sm text-on-surface-variant">Showing top 100 hunters. Your rank: <span class="font-bold text-primary">#1,244</span></p>
+<div class="flex gap-2">
+<button class="w-10 h-10 flex items-center justify-center bg-surface-container-lowest rounded-lg hover:bg-surface-container transition-colors shadow-sm shadow-slate-200/20">
+<span class="material-symbols-outlined text-sm">chevron_left</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center bg-primary text-on-primary rounded-lg shadow-sm shadow-slate-900/10">1</button>
+<button class="w-10 h-10 flex items-center justify-center bg-surface-container-lowest rounded-lg hover:bg-surface-container transition-colors shadow-sm shadow-slate-200/20 text-sm font-bold">2</button>
+<button class="w-10 h-10 flex items-center justify-center bg-surface-container-lowest rounded-lg hover:bg-surface-container transition-colors shadow-sm shadow-slate-200/20 text-sm font-bold">3</button>
+<button class="w-10 h-10 flex items-center justify-center bg-surface-container-lowest rounded-lg hover:bg-surface-container transition-colors shadow-sm shadow-slate-200/20">
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<!-- History Section (Horizontal Scroll) -->
+<section class="mt-24">
+<div class="flex justify-between items-end mb-8">
+<div>
+<h2 class="text-3xl font-headline font-bold text-primary">History of the Ledger</h2>
+<p class="text-on-surface-variant">Key shifts and legendary movements in the Monolith rankings.</p>
+</div>
+<button class="text-primary font-bold flex items-center gap-2 hover:gap-3 transition-all duration-300">
+                    Full Archive <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- History Card 1 -->
+<div class="p-8 bg-surface-container rounded-xl">
+<span class="text-xs font-bold text-secondary-container uppercase tracking-widest mb-3 block">May 2024</span>
+<h3 class="text-lg font-bold text-primary mb-2">The Great Verification Surge</h3>
+<p class="text-sm text-on-surface-variant mb-6 leading-relaxed">System-wide reputation recalibration. Over 400 new hunters entered the top tier within 48 hours.</p>
+<div class="flex items-center gap-2 text-primary font-bold text-xs">
+<span class="material-symbols-outlined text-sm">history</span> Read Summary
+                    </div>
+</div>
+<!-- History Card 2 -->
+<div class="p-8 bg-surface-container rounded-xl">
+<span class="text-xs font-bold text-secondary-container uppercase tracking-widest mb-3 block">April 2024</span>
+<h3 class="text-lg font-bold text-primary mb-2">Ascension of 0xAegis</h3>
+<p class="text-sm text-on-surface-variant mb-6 leading-relaxed">For the first time in Ante history, a single hunter maintained 100% accuracy over 50 consecutive posts.</p>
+<div class="flex items-center gap-2 text-primary font-bold text-xs">
+<span class="material-symbols-outlined text-sm">history</span> Read Summary
+                    </div>
+</div>
+<!-- History Card 3 -->
+<div class="p-8 bg-surface-container rounded-xl">
+<span class="text-xs font-bold text-secondary-container uppercase tracking-widest mb-3 block">March 2024</span>
+<h3 class="text-lg font-bold text-primary mb-2">The Node Expansion</h3>
+<p class="text-sm text-on-surface-variant mb-6 leading-relaxed">Integration of the secondary consensus layer. Leaderboard scores were multiplied by node weight.</p>
+<div class="flex items-center gap-2 text-primary font-bold text-xs">
+<span class="material-symbols-outlined text-sm">history</span> Read Summary
+                    </div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full py-12 bg-slate-100 dark:bg-slate-900 no-border bg-slate-50 dark:bg-slate-900/50">
+<div class="flex flex-col md:flex-row justify-between items-center px-8 max-w-7xl mx-auto font-inter text-sm tracking-wide text-slate-600 dark:text-slate-400">
+<div class="mb-6 md:mb-0">
+                © 2024 Ante. Built on the Monolith.
+            </div>
+<div class="flex gap-8">
+<a class="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white underline-offset-4 hover:underline opacity-100 hover:opacity-80 transition-opacity" href="#">Docs</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white underline-offset-4 hover:underline opacity-100 hover:opacity-80 transition-opacity" href="#">Discord</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white underline-offset-4 hover:underline opacity-100 hover:opacity-80 transition-opacity" href="#">Status</a>
+</div>
+</div>
+</footer>
+</body></html>
