@@ -9,7 +9,7 @@ pub mod helper;
 const TOKEN_DEMICAL: u8 = 6;
 const ANCHOR_DISCRIMINATOR: usize = 8;
 const ONE_WEEK_IN_SECONDS: u64 = 604800;
-declare_id!("FraezYKQ1zKbysJJK7jYGr8J2ZVt5Cyz3GrQ3WSDLQyS");
+declare_id!("R7tfA5vJNjYZJnEK9jy39Db8DiMwPtF95T8BiBnxbwd");
 #[program]
 pub mod challenge_protocol {
 

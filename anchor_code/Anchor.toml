@@ -5,8 +5,8 @@ package_manager = "yarn"
 resolution = true
 skip-lint = false
 
-[programs.localnet]
-challenge_protocol = "FraezYKQ1zKbysJJK7jYGr8J2ZVt5Cyz3GrQ3WSDLQyS"
+[programs.devnet]
+challenge_protocol = "R7tfA5vJNjYZJnEK9jy39Db8DiMwPtF95T8BiBnxbwd"
 
 [registry]
 url = "https://api.apr.dev"
