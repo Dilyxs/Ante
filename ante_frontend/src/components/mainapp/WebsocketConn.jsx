@@ -1,5 +1,5 @@
-import { createContext, useContext, useRef, useState } from "react";
-export const WebsocketHandler = createContext({});
+import { useEffect, useRef, useState } from "react";
+import { WebsocketHandler } from "./WebsocketContext";
 const WebsocketConn = ({ children }) => {
   const [incomingMessages, setincomingMessages] = useState([]);
   const [loaded, setloaded] = useState(false);

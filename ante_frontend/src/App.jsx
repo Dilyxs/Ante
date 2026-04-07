@@ -4,6 +4,8 @@ import MainPage from "./components/LandingPage/MainPage";
 import HowItWorksPage from "./components/LandingPage/HowItWorksPage";
 import NotFoundPage from "./components/LandingPage/NotFoundPage";
 import Dashboard from "./components/mainapp/Dashboard";
+import WebsocketConn from "./components/mainapp/WebsocketConn";
+import WalletConn from "./components/mainapp/WalletConn";
 
 function App() {
   return (
@@ -14,7 +16,16 @@ function App() {
           <Route path="howitworks" element={<HowItWorksPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Route>
-        <Route path="dashboard" element={<Dashboard />} />
+        <Route
+          path="dashboard"
+          element={
+            <WalletConn>
+              <WebsocketConn>
+                <Dashboard />
+              </WebsocketConn>
+            </WalletConn>
+          }
+        />
       </Routes>
     </BrowserRouter>
   );
