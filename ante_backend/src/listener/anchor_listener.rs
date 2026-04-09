@@ -15,6 +15,7 @@ pub enum ActionType {
     Refund,
     NotYetDetermined,
     Undefined,
+    EOF,
 }
 pub struct ProgramEvent {
     pub event_data: Vec<String>,
@@ -42,21 +43,32 @@ pub async fn listen_to_program(
         .expect("Failed to subscribe to logs");
 
     loop {
-        if let Some(log) = stream.next().await {
+        tokio::select! {
+            log = stream.next() => {
+                if let Some(existing_log)=log{
             let content = ProgramEvent {
-                event_data: log.value.logs,
+                event_data: existing_log.value.logs,
                 event_type: ActionType::Undefined,
-                event_error: log.value.err,
+                event_error: existing_log.value.err,
             };
             let pos = program_even_chan.send(content).await;
             if pos.is_err() {
                 break;
             }
-        }
-
-        if cancel_chan.has_changed().is_ok() {
-            break;
+                }
+        },
+         _ = cancel_chan.changed() => {
+                break; //happens if is_ok() actual chancel or it does dropped, either way calcel out
+                }
         }
     }
+
     unsub().await;
+    program_even_chan
+        .send(ProgramEvent {
+            event_data: Vec::new(),
+            event_type: ActionType::EOF,
+            event_error: None,
+        })
+        .await;
 }
