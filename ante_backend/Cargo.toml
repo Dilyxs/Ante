@@ -7,7 +7,7 @@ edition = "2024"
 dotenvy = "0.15.7"
 solana-client = "3.1.12"
 solana-sdk = "4.0.1"
-axum = {version="0.8.8", features=["ws"]}
+axum = {version="0.8.8", features=["ws","macros" ]}
 tokio-stream = "0.1"
 postgres = "0.19.13"
 tokio-tungstenite = "0.29.0"  

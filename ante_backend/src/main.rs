@@ -1,6 +1,12 @@
-use axum::{Router, routing::get};
+use axum::{
+    Router,
+    extract::FromRef,
+    routing::{any, get},
+};
+use futures_util::lock::Mutex;
 use std::default;
 use std::env::var;
+use std::sync::Arc;
 use tokio::sync::mpsc::{Receiver, Sender};
 use tokio::sync::watch::{
     Receiver as WatchReceiver, Sender as WatchSender, channel as watch_channel,
@@ -8,6 +14,17 @@ use tokio::sync::watch::{
 use tokio::task::JoinHandle;
 
 use crate::listener::anchor_listener::{ActionType, listen_to_program};
+use crate::listener::socket_listener::{
+    BlockchainEvent, IDManager, WebSocketManager, WebSocketManagerCommandType,
+    WebsocketMessageCommnand, ws_handler,
+};
+
+#[derive(Clone, FromRef, Debug)]
+pub struct AppState {
+    pub id_manager: Arc<Mutex<IDManager>>,
+    pub cancel_chan: WatchReceiver<bool>,
+    pub websocket_manager_chan: Sender<WebsocketMessageCommnand>,
+}
 mod db_data;
 mod listener;
 #[tokio::main]
@@ -29,6 +46,17 @@ async fn main() {
         listen_to_program(tx_event_sender, rx_clone).await;
     });
     handlers.push(handle);
+    let mut websocket_manager = listener::socket_listener::WebSocketManager::init();
+    let (mut websocket_manager_chan_sender, websocket_manager_chan_receiver): (
+        Sender<WebsocketMessageCommnand>,
+        Receiver<WebsocketMessageCommnand>,
+    ) = tokio::sync::mpsc::channel(10);
+    let rx_clone = cancellation_listener.clone();
+    tokio::spawn(async move {
+        websocket_manager
+            .handle_websocket_messages(websocket_manager_chan_receiver, rx_clone)
+            .await;
+    });
 
     /*
     println!("now reading program");
@@ -46,10 +74,16 @@ async fn main() {
     println!("done reading program");
     return;
     */
-
-    ///acknowledge that this won't even run!
+    let mut id_manager = IDManager::init();
+    let app_state = AppState {
+        id_manager: Arc::new(Mutex::new(id_manager)),
+        cancel_chan: cancellation_listener.clone(),
+        websocket_manager_chan: websocket_manager_chan_sender.clone(),
+    };
     println!("server is running");
-    let app: Router = Router::new().route("/", get(|| async { "server is up" }));
+    let app: Router = Router::new()
+        .route("/", get(|| async { "server is up" }))
+        .route("/websocket", any(ws_handler))
+        .with_state(app_state);
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3004").await.unwrap();
-    axum::serve(listener, app).await.unwrap();
 }

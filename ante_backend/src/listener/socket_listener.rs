@@ -109,6 +109,11 @@ impl WebSocketManager {
 pub struct IDManager {
     id: i32,
 }
+impl IDManager {
+    pub fn init() -> Self {
+        IDManager { id: 0 }
+    }
+}
 pub async fn ws_handler(
     ws: WebSocketUpgrade,
     State(id_manager): State<Arc<Mutex<IDManager>>>,
