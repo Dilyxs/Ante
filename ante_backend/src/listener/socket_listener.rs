@@ -25,14 +25,24 @@ pub enum ResponseToWebSocketCommandType {
 pub trait ResponseToWebSocket: Send {
     fn get_response_type(&self) -> ResponseToWebSocketCommandType;
     fn serialize(&self) -> Bytes;
+    fn clone_box(&self) -> Box<dyn ResponseToWebSocket>;
+}
+impl Clone for Box<dyn ResponseToWebSocket> {
+    fn clone(&self) -> Box<dyn ResponseToWebSocket> {
+        self.clone_box()
+    }
 }
 pub struct WebsocketMessageCommnand {
-    message_type: Option<WebSocketManagerCommandType>,
-    user_channel: Option<Sender<Box<dyn ResponseToWebSocket>>>,
-    user_id: Option<i32>,
-    block_chain_event: Option<BlockchainEvent>,
+    pub message_type: Option<WebSocketManagerCommandType>,
+    pub user_channel: Option<Sender<Box<dyn ResponseToWebSocket>>>,
+    pub user_id: Option<i32>,
+    pub block_chain_event: Option<BlockchainEvent>,
+    pub log_info: Option<Box<dyn EmitLog>>,
 }
 
+pub trait EmitLog: ResponseToWebSocket {
+    fn get_bounty_id(&self) -> i32;
+}
 #[derive(Debug, Deserialize, Serialize)]
 pub enum WebSocketManagerCommandType {
     QuitWebsocket,
@@ -49,8 +59,8 @@ pub enum BlockchainEvent {
     NewAnswer,
 }
 pub struct WebSocketManager {
-    feed: HashMap<i32, Sender<Box<dyn ResponseToWebSocket>>>,
-    bounty_room: HashMap<i32, Sender<Box<dyn ResponseToWebSocket>>>,
+    feed: HashMap<i32, Sender<Box<dyn ResponseToWebSocket>>>, //this is user_id to chan
+    bounty_room: HashMap<i32, HashMap<i32, Sender<Box<dyn ResponseToWebSocket>>>>, //bounty_id to  {user_id to chan}
 }
 impl WebSocketManager {
     pub fn init() -> Self {
@@ -72,10 +82,20 @@ impl WebSocketManager {
                 match command.message_type.unwrap() {
                     WebSocketManagerCommandType::QuitWebsocket => {
                         self.feed.remove(&user_id);
-                        self.bounty_room.remove(&user_id);
+                        if command.log_info.is_some() {
+                            let room_number = command.log_info.unwrap().get_bounty_id();
+                            if let Some(arr) = self.bounty_room.get_mut(&room_number) {
+                                arr.remove(&user_id);
+                            }
+                        }
                     }
                     WebSocketManagerCommandType::QuitBountyID(bounty_id) => {
-                        self.bounty_room.remove(&bounty_id);
+                        if command.log_info.is_some() {
+                            let room_number = command.log_info.unwrap().get_bounty_id();
+                            if let Some(arr) = self.bounty_room.get_mut(&room_number) {
+                                arr.remove(&user_id);
+                            }
+                        }
                     }
                     WebSocketManagerCommandType::QuitFeed => {
                         self.feed.remove(&user_id);
@@ -87,17 +107,26 @@ impl WebSocketManager {
                     }
                     WebSocketManagerCommandType::ConnectBountyID(bounty_id) => {
                         if let Some(user_channel) = command.user_channel {
-                            self.bounty_room.insert(bounty_id, user_channel);
+                            if command.log_info.is_some() {
+                                let room_number = command.log_info.unwrap().get_bounty_id();
+                                if let Some(arr) = self.bounty_room.get_mut(&room_number) {
+                                    arr.insert(user_id, user_channel);
+                                }
+                            }
                         }
                     }
                 }
                 continue;
-            }
-            if command.block_chain_event.is_some() {
+            } else if command.block_chain_event.is_some() && command.log_info.is_some() {
                 let event = command.block_chain_event.unwrap();
                 //TODO: eventually build out custom message for each type after parsing is done!
                 match event {
-                    BlockchainEvent::NewWinner => for (_, channel) in self.feed.iter() {},
+                    BlockchainEvent::NewWinner => {
+                        let mut content = command.log_info.unwrap() as Box<dyn ResponseToWebSocket>;
+                        for (_, channel) in self.feed.iter() {
+                            channel.send(content.clone()).await;
+                        }
+                    }
                     BlockchainEvent::NewVote => for (_, channel) in self.feed.iter() {},
                     BlockchainEvent::NewPost => for (_, channel) in self.feed.iter() {},
                     BlockchainEvent::NewAnswer => {}
@@ -164,6 +193,7 @@ pub async fn handle_websocket(
                                 user_channel: None,
                                 user_id: Some(user_id),
                                 block_chain_event: None,
+                                log_info: None,
                             })
                             .await;
                     }
@@ -175,6 +205,7 @@ pub async fn handle_websocket(
                         user_channel: None,
                         user_id: Some(user_id),
                         block_chain_event: None,
+                        log_info: None,
                     })
                     .await;
             }
@@ -184,6 +215,7 @@ pub async fn handle_websocket(
     websocket_manager_chan
         .send(WebsocketMessageCommnand {
             message_type: Some(WebSocketManagerCommandType::ConnectFeed),
+            log_info: None,
             user_channel: Some(user_sender_Chan),
             user_id: Some(user_id),
             block_chain_event: None,

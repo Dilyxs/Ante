@@ -26,6 +26,7 @@ pub struct AppState {
     pub websocket_manager_chan: Sender<WebsocketMessageCommnand>,
 }
 mod db_data;
+mod decryption;
 mod listener;
 #[tokio::main]
 async fn main() {
@@ -58,7 +59,6 @@ async fn main() {
             .await;
     });
 
-    /*
     println!("now reading program");
     loop {
         let new_content = tx_event_receiver.recv().await;
@@ -67,13 +67,15 @@ async fn main() {
             if let ActionType::EOF = response.event_type {
                 break;
             }
-            println!("logs are {:?}", response.event_data);
+            //println!("logs are {:?}", response.event_data);
+            for log in response.event_data {
+                println!("{}", log);
+            }
         }
-        cancellation_sender.send(true).unwrap();
+        //cancellation_sender.send(true).unwrap();
     }
     println!("done reading program");
     return;
-    */
     let mut id_manager = IDManager::init();
     let app_state = AppState {
         id_manager: Arc::new(Mutex::new(id_manager)),
