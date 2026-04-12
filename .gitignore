@@ -62,3 +62,5 @@ target/**/deploy/*.json
 *.tmp
 .yarn
 test_dev*
+listener_events*
+test_v2*

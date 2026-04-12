@@ -296,7 +296,10 @@ pub mod challenge_protocol {
             TOKEN_DEMICAL,
         )?;
         ctx.accounts.user_balance_info.balance += ctx.accounts.poster_info.submission_cost;
-        emit!(PublisherNotResponded { poster_id });
+        emit!(PublisherNotResponded {
+            poster_id,
+            published_id: ctx.accounts.poster_info.publisher,
+        });
         Ok(())
     }
     pub fn post_poster_winner(
@@ -843,41 +846,41 @@ pub enum BountyTopic {
 #[account]
 pub struct Poster {
     pub publisher: Pubkey,
-    bounty_id: u64,
-    bounty_type: BountyType,
-    bounty_topic: BountyTopic,
-    bounty_minimum_gain: u64,
-    submission_cost: u64,
-    deadline: u64,
-    current_time: u64,
-    potential_answer: Option<[u8; 33]>,
+    pub bounty_id: u64,
+    pub bounty_type: BountyType,
+    pub bounty_topic: BountyTopic,
+    pub bounty_minimum_gain: u64,
+    pub submission_cost: u64,
+    pub deadline: u64,
+    pub current_time: u64,
+    pub potential_answer: Option<[u8; 33]>,
 }
 #[derive(AnchorDeserialize, AnchorSerialize)]
 pub struct PosterInfo {
-    bounty_id: u64,
-    bounty_type: BountyType,
-    bounty_topic: BountyTopic,
-    bounty_minimum_gain: u64,
-    submission_cost: u64,
-    deadline: u64,
-    current_time: u64,
-    potential_answer: Option<[u8; 33]>,
+    pub bounty_id: u64,
+    pub bounty_type: BountyType,
+    pub bounty_topic: BountyTopic,
+    pub bounty_minimum_gain: u64,
+    pub submission_cost: u64,
+    pub deadline: u64,
+    pub current_time: u64,
+    pub potential_answer: Option<[u8; 33]>,
 }
 
 #[account]
 #[derive(InitSpace)]
 pub struct PosterResponse {
-    answerer: Pubkey,
-    time: u64,
-    poster_id: u64,
-    answer_id: u64,
-    answer: Option<[u8; 33]>,
+    pub answerer: Pubkey,
+    pub time: u64,
+    pub poster_id: u64,
+    pub answer_id: u64,
+    pub answer: Option<[u8; 33]>,
 }
 #[derive(AnchorDeserialize, AnchorSerialize)]
 pub struct PosterResponseInfo {
-    time: u64,
-    poster_id: u64,
-    answer: Option<[u8; 33]>,
+    pub time: u64,
+    pub poster_id: u64,
+    pub answer: Option<[u8; 33]>,
 }
 
 #[account]
@@ -992,6 +995,7 @@ pub struct PosterWinnerPostedEvent {
 #[event]
 pub struct PublisherNotResponded {
     pub poster_id: u64,
+    pub published_id: Pubkey,
 }
 #[event]
 pub struct VoteForWinnerPosted {
