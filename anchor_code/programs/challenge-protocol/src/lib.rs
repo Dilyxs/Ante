@@ -829,12 +829,12 @@ pub struct InitializeProgram<'info> {
     pub associated_token_program: Program<'info, AssociatedToken>,
 }
 
-#[derive(Clone, InitSpace, AnchorDeserialize, AnchorSerialize)]
+#[derive(Clone, InitSpace, AnchorDeserialize, AnchorSerialize, Debug)]
 pub enum BountyType {
     OpenEnded,
     DirectAnswer,
 }
-#[derive(Clone, InitSpace, AnchorDeserialize, AnchorSerialize)]
+#[derive(Clone, InitSpace, AnchorDeserialize, AnchorSerialize, Debug)]
 pub enum BountyTopic {
     NumberTheory,
     CryptoPuzzle,
@@ -855,7 +855,7 @@ pub struct Poster {
     pub current_time: u64,
     pub potential_answer: Option<[u8; 33]>,
 }
-#[derive(AnchorDeserialize, AnchorSerialize, Clone)]
+#[derive(AnchorDeserialize, AnchorSerialize, Clone, Debug)]
 pub struct PosterInfo {
     pub bounty_id: u64,
     pub bounty_type: BountyType,
@@ -876,7 +876,7 @@ pub struct PosterResponse {
     pub answer_id: u64,
     pub answer: Option<[u8; 33]>,
 }
-#[derive(AnchorDeserialize, AnchorSerialize, Clone)]
+#[derive(AnchorDeserialize, AnchorSerialize, Clone, Debug)]
 pub struct PosterResponseInfo {
     pub time: u64,
     pub poster_id: u64,
@@ -906,13 +906,13 @@ pub struct PosterAnswererDecryptedAnswer {
     #[max_len(32)]
     pub hash: String,
 }
-#[derive(AnchorDeserialize, AnchorSerialize, Clone)]
+#[derive(AnchorDeserialize, AnchorSerialize, Clone, Debug)]
 pub struct PosterPublisherDecryptedAnswerInfo {
     pub poster_id: u64,
     pub answer: String,
     pub hash: String,
 }
-#[derive(AnchorDeserialize, AnchorSerialize, Clone)]
+#[derive(AnchorDeserialize, AnchorSerialize, Clone, Debug)]
 pub struct PosterAnswererDecryptedAnswerInfo {
     pub poster_id: u64,
     pub answer: String,
@@ -967,43 +967,43 @@ pub struct VaultGlobalState {
     pub bounty_counter: u64,
     pub response_counter: u64,
 }
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 #[event]
 pub struct PosterCreated {
     pub publisher: Pubkey,
     pub poster_info: PosterInfo,
 }
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 #[event]
 pub struct PosterAnswered {
     pub answerer: Pubkey,
     pub poster_response: PosterResponseInfo,
 }
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 #[event]
 pub struct PosterPublishAnswered {
     pub publisher: Pubkey,
     pub poster_publisher_decrypted_answer: PosterPublisherDecryptedAnswerInfo,
 }
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 #[event]
 pub struct AnswererDecryptedAnswerPosted {
     pub answerer: Pubkey,
     pub answerer_decrypted_answer: PosterAnswererDecryptedAnswerInfo,
 }
 #[event]
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct PosterWinnerPostedEvent {
     pub poster_id: u64,
     pub winner: Pubkey,
 }
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 #[event]
 pub struct PublisherNotResponded {
     pub poster_id: u64,
     pub published_id: Pubkey,
 }
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 #[event]
 pub struct VoteForWinnerPosted {
     pub poster_id: u64,
