@@ -1,3 +1,4 @@
+use anchor_lang::AnchorSerialize;
 use axum::{
     body::Bytes,
     extract::{
@@ -6,6 +7,7 @@ use axum::{
     },
     response::Response,
 };
+use challenge_protocol::{PosterCreated, PosterWinnerPostedEvent, VoteForWinnerPosted};
 use futures_util::SinkExt;
 use futures_util::StreamExt;
 use futures_util::lock::Mutex;
@@ -32,16 +34,146 @@ impl Clone for Box<dyn ResponseToWebSocket> {
         self.clone_box()
     }
 }
+#[derive(Debug, Deserialize, Serialize)]
+pub enum BlockchainEvent {
+    NewWinner,
+    NewVote,
+    NewPost,
+    NewAnswer,
+}
+#[derive(Clone)]
+pub struct NewWinner {
+    content: PosterWinnerPostedEvent,
+}
+impl NewWinner {
+    pub fn get_response_content(&self) -> ResponseToWebSocketCommandType {
+        ResponseToWebSocketCommandType::RecentWinner
+    }
+}
+
+impl ResponseToWebSocket for NewWinner {
+    fn get_response_type(&self) -> ResponseToWebSocketCommandType {
+        self.get_response_content()
+    }
+    fn serialize(&self) -> Bytes {
+        let possible_bytes = self.content.try_to_vec().unwrap_or_default();
+        Bytes::copy_from_slice(&possible_bytes)
+    }
+    fn clone_box(&self) -> Box<dyn ResponseToWebSocket> {
+        return Box::new(self.clone());
+    }
+}
+impl EmitLog for NewWinner {
+    fn get_bounty_id(&self) -> i32 {
+        self.content.poster_id as i32
+    }
+    fn get_response_type(&self) -> ResponseToWebSocketCommandType {
+        self.get_response_content()
+    }
+}
+#[derive(Debug, Clone)]
+pub struct NewVote {
+    content: VoteForWinnerPosted,
+}
+impl NewVote {
+    pub fn get_response_content(&self) -> ResponseToWebSocketCommandType {
+        ResponseToWebSocketCommandType::RecentVote
+    }
+}
+impl ResponseToWebSocket for NewVote {
+    fn get_response_type(&self) -> ResponseToWebSocketCommandType {
+        self.get_response_content()
+    }
+    fn serialize(&self) -> Bytes {
+        let possible_bytes = self.content.try_to_vec().unwrap_or_default();
+        Bytes::copy_from_slice(&possible_bytes)
+    }
+    fn clone_box(&self) -> Box<dyn ResponseToWebSocket> {
+        return Box::new(self.clone());
+    }
+}
+impl EmitLog for NewVote {
+    fn get_bounty_id(&self) -> i32 {
+        self.content.poster_id as i32
+    }
+    fn get_response_type(&self) -> ResponseToWebSocketCommandType {
+        self.get_response_content()
+    }
+}
+#[derive(Debug, Clone)]
+pub struct NewPost {
+    content: PosterCreated,
+}
+impl NewPost {
+    pub fn get_response_content(&self) -> ResponseToWebSocketCommandType {
+        ResponseToWebSocketCommandType::RecentPost
+    }
+}
+impl ResponseToWebSocket for NewPost {
+    fn get_response_type(&self) -> ResponseToWebSocketCommandType {
+        self.get_response_content()
+    }
+    fn serialize(&self) -> Bytes {
+        let possible_bytes = self.content.try_to_vec().unwrap_or_default();
+        Bytes::copy_from_slice(&possible_bytes)
+    }
+    fn clone_box(&self) -> Box<dyn ResponseToWebSocket> {
+        return Box::new(self.clone());
+    }
+}
+impl EmitLog for NewPost {
+    fn get_bounty_id(&self) -> i32 {
+        self.content.poster_info.bounty_id as i32
+    }
+    fn get_response_type(&self) -> ResponseToWebSocketCommandType {
+        self.get_response_content()
+    }
+}
+#[derive(Debug, Deserialize, Serialize, Clone)]
+pub struct RecentAnswer {
+    is_decrypted: bool,
+    publisher_poster: bool,
+    answer: String,
+    hash: String,
+    poster_id: i32,
+}
+impl RecentAnswer {
+    pub fn get_response_content(&self) -> ResponseToWebSocketCommandType {
+        ResponseToWebSocketCommandType::RecentAnswer
+    }
+}
+impl ResponseToWebSocket for RecentAnswer {
+    fn get_response_type(&self) -> ResponseToWebSocketCommandType {
+        self.get_response_content()
+    }
+    fn serialize(&self) -> Bytes {
+        let possible_bytes = serde_json::to_vec(&self).unwrap_or_default();
+        Bytes::copy_from_slice(&possible_bytes)
+    }
+    fn clone_box(&self) -> Box<dyn ResponseToWebSocket> {
+        Box::new(self.clone())
+    }
+}
+impl EmitLog for RecentAnswer {
+    fn get_bounty_id(&self) -> i32 {
+        self.poster_id
+    }
+    fn get_response_type(&self) -> ResponseToWebSocketCommandType {
+        self.get_response_content()
+    }
+}
+pub trait WebSocketEnabledEmitLog: ResponseToWebSocket + EmitLog + Send {}
 pub struct WebsocketMessageCommnand {
     pub message_type: Option<WebSocketManagerCommandType>,
     pub user_channel: Option<Sender<Box<dyn ResponseToWebSocket>>>,
     pub user_id: Option<i32>,
     pub block_chain_event: Option<BlockchainEvent>,
-    pub log_info: Option<Box<dyn EmitLog>>,
+    pub log_info: Option<Box<dyn WebSocketEnabledEmitLog>>,
 }
 
-pub trait EmitLog: ResponseToWebSocket {
+pub trait EmitLog: Send {
     fn get_bounty_id(&self) -> i32;
+    fn get_response_type(&self) -> ResponseToWebSocketCommandType;
 }
 #[derive(Debug, Deserialize, Serialize)]
 pub enum WebSocketManagerCommandType {
@@ -50,13 +182,6 @@ pub enum WebSocketManagerCommandType {
     QuitFeed,
     ConnectFeed,
     ConnectBountyID(i32),
-}
-#[derive(Debug, Deserialize, Serialize)]
-pub enum BlockchainEvent {
-    NewWinner,
-    NewVote,
-    NewPost,
-    NewAnswer,
 }
 pub struct WebSocketManager {
     feed: HashMap<i32, Sender<Box<dyn ResponseToWebSocket>>>, //this is user_id to chan
@@ -123,8 +248,9 @@ impl WebSocketManager {
                 match event {
                     BlockchainEvent::NewWinner => {
                         let mut content = command.log_info.unwrap() as Box<dyn ResponseToWebSocket>;
+
                         for (_, channel) in self.feed.iter() {
-                            channel.send(content.clone()).await;
+                            channel.send(content.clone_box()).await;
                         }
                     }
                     BlockchainEvent::NewVote => for (_, channel) in self.feed.iter() {},

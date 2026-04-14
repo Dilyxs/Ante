@@ -1,6 +1,6 @@
-use crate::BlockchainEvent;
 use crate::listener::socket_listener::WebsocketMessageCommnand;
-use anchor_lang::{AnchorDeserialize, Discriminator};
+use crate::{BlockchainEvent, listener::socket_listener::ResponseToWebSocket};
+use anchor_lang::{AnchorDeserialize, AnchorSerialize, Discriminator};
 use base64::{Engine as _, engine::general_purpose::STANDARD};
 use challenge_protocol::{
     AnswererDecryptedAnswerPosted, PosterAnswered, PosterCreated, PosterPublishAnswered,
@@ -111,10 +111,8 @@ pub fn decode_solana_logs(input: Vec<String>) -> Option<WebsocketMessageCommnand
 
 use crate::listener::socket_listener::EmitLog;
 
-impl EmitLog for PosterCreated {}
 impl EmitLog for PosterAnswered {}
 impl EmitLog for PosterPublishAnswered {}
 impl EmitLog for AnswererDecryptedAnswerPosted {}
 impl EmitLog for PosterWinnerPostedEvent {}
 impl EmitLog for PublisherNotResponded {}
-impl EmitLog for VoteForWinnerPosted {}
