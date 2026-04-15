@@ -243,19 +243,10 @@ impl WebSocketManager {
                 }
                 continue;
             } else if command.block_chain_event.is_some() && command.log_info.is_some() {
-                let event = command.block_chain_event.unwrap();
-                //TODO: eventually build out custom message for each type after parsing is done!
-                match event {
-                    BlockchainEvent::NewWinner => {
-                        let mut content = command.log_info.unwrap() as Box<dyn ResponseToWebSocket>;
+                let mut content = command.log_info.unwrap() as Box<dyn ResponseToWebSocket>;
 
-                        for (_, channel) in self.feed.iter() {
-                            channel.send(content.clone_box()).await;
-                        }
-                    }
-                    BlockchainEvent::NewVote => for (_, channel) in self.feed.iter() {},
-                    BlockchainEvent::NewPost => for (_, channel) in self.feed.iter() {},
-                    BlockchainEvent::NewAnswer => {}
+                for (_, channel) in self.feed.iter() {
+                    channel.send(content.clone_box()).await;
                 }
             }
         }
