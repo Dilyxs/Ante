@@ -163,6 +163,11 @@ impl EmitLog for RecentAnswer {
     }
 }
 pub trait WebSocketEnabledEmitLog: ResponseToWebSocket + EmitLog + Send {}
+impl WebSocketEnabledEmitLog for NewWinner {}
+impl WebSocketEnabledEmitLog for NewVote {}
+impl WebSocketEnabledEmitLog for NewPost {}
+impl WebSocketEnabledEmitLog for RecentAnswer {}
+
 pub struct WebsocketMessageCommnand {
     pub message_type: Option<WebSocketManagerCommandType>,
     pub user_channel: Option<Sender<Box<dyn ResponseToWebSocket>>>,
