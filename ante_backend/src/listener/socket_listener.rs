@@ -46,6 +46,10 @@ pub struct NewWinner {
     content: PosterWinnerPostedEvent,
 }
 impl NewWinner {
+    pub fn new(content: PosterWinnerPostedEvent) -> Self {
+        Self { content }
+    }
+
     pub fn get_response_content(&self) -> ResponseToWebSocketCommandType {
         ResponseToWebSocketCommandType::RecentWinner
     }
@@ -76,6 +80,10 @@ pub struct NewVote {
     content: VoteForWinnerPosted,
 }
 impl NewVote {
+    pub fn new(content: VoteForWinnerPosted) -> Self {
+        Self { content }
+    }
+
     pub fn get_response_content(&self) -> ResponseToWebSocketCommandType {
         ResponseToWebSocketCommandType::RecentVote
     }
@@ -102,9 +110,13 @@ impl EmitLog for NewVote {
 }
 #[derive(Debug, Clone)]
 pub struct NewPost {
-    content: PosterCreated,
+    pub content: PosterCreated,
 }
 impl NewPost {
+    pub fn new(content: PosterCreated) -> Self {
+        Self { content }
+    }
+
     pub fn get_response_content(&self) -> ResponseToWebSocketCommandType {
         ResponseToWebSocketCommandType::RecentPost
     }
@@ -138,6 +150,22 @@ pub struct RecentAnswer {
     poster_id: i32,
 }
 impl RecentAnswer {
+    pub fn new(
+        is_decrypted: bool,
+        publisher_poster: bool,
+        answer: String,
+        hash: String,
+        poster_id: i32,
+    ) -> Self {
+        Self {
+            is_decrypted,
+            publisher_poster,
+            answer,
+            hash,
+            poster_id,
+        }
+    }
+
     pub fn get_response_content(&self) -> ResponseToWebSocketCommandType {
         ResponseToWebSocketCommandType::RecentAnswer
     }
