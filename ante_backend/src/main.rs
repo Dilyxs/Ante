@@ -4,7 +4,6 @@ use axum::{
     routing::{any, get},
 };
 use futures_util::lock::Mutex;
-use std::default;
 use std::env::var;
 use std::sync::Arc;
 use tokio::sync::mpsc::{Receiver, Sender};
@@ -59,22 +58,7 @@ async fn main() {
             .await;
     });
 
-    println!("now reading program");
-    loop {
-        let new_content = tx_event_receiver.recv().await;
-        //print it out
-        if let Some(response) = new_content {
-            if let ActionType::EOF = response.event_type {
-                break;
-            }
-            //println!("logs are {:?}", response.event_data);
-            for log in response.event_data {
-                println!("{}", log);
-            }
-        }
-        //cancellation_sender.send(true).unwrap();
-    }
-    println!("done reading program");
+    //use websocket_manager_chan_sender && tx_event_receiver to read from it
     return;
     let mut id_manager = IDManager::init();
     let app_state = AppState {
