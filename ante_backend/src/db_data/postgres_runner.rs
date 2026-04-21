@@ -1,7 +1,10 @@
+use tokio::sync::mpsc::{Receiver, Sender};
+
 use challenge_protocol::{
     AnswererDecryptedAnswerPosted, BountyTopic, BountyType, PosterAnswered, PosterCreated,
     PosterPublishAnswered, PosterWinnerPostedEvent, PublisherNotResponded, VoteForWinnerPosted,
 };
+use futures_util::future::BoxFuture;
 use sqlx::{
     FromRow, PgPool, Pool,
     postgres::{PgQueryResult, PgRow},
@@ -12,6 +15,9 @@ pub async fn create_pool(db_url: &str) -> PgPool {
     //NOTE: we want to crash if we can't get it
     pool.unwrap()
 }
+pub enum SelectDataType {
+    PosterInfo,
+}
 
 pub enum SQLRequestType {
     Insert,
@@ -20,10 +26,19 @@ pub enum SQLRequestType {
     Select,
 }
 
+pub trait SelectResult {
+    fn get_content_len(&self) -> i32;
+}
+
 pub trait SQLRequest {
     fn get_request_type(&self) -> SQLRequestType;
     fn get_position_arg(&self) -> Vec<String>;
     fn get_query(&self) -> String;
+    fn get_select_type(&self) -> Option<SelectDataType>;
+}
+pub struct RequestSQL<T> {
+    chan: Sender<Result<SQLResult<T>, sqlx::Error>>,
+    req: Box<dyn SQLRequest>,
 }
 
 fn bounty_type_to_string(bounty_type: &BountyType) -> String {
@@ -75,6 +90,9 @@ impl SQLRequest for PosterCreated {
     fn get_query(&self) -> String {
         "INSERT INTO poster_created_events (publisher, bounty_id, bounty_type, bounty_topic, bounty_minimum_gain, submission_cost, deadline, current_time, potential_answer) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)".to_string()
     }
+    fn get_select_type(&self) -> Option<SelectDataType> {
+        None
+    }
 }
 
 impl SQLRequest for PosterAnswered {
@@ -93,6 +111,10 @@ impl SQLRequest for PosterAnswered {
 
     fn get_query(&self) -> String {
         "INSERT INTO poster_answered_events (answerer, answer_time, poster_id, encrypted_answer) VALUES ($1, $2, $3, $4)".to_string()
+    }
+
+    fn get_select_type(&self) -> Option<SelectDataType> {
+        None
     }
 }
 
@@ -113,6 +135,10 @@ impl SQLRequest for PosterPublishAnswered {
     fn get_query(&self) -> String {
         "INSERT INTO poster_publish_answered_events (publisher, poster_id, answer, answer_hash) VALUES ($1, $2, $3, $4)".to_string()
     }
+
+    fn get_select_type(&self) -> Option<SelectDataType> {
+        None
+    }
 }
 
 impl SQLRequest for AnswererDecryptedAnswerPosted {
@@ -132,6 +158,10 @@ impl SQLRequest for AnswererDecryptedAnswerPosted {
     fn get_query(&self) -> String {
         "INSERT INTO answerer_decrypted_answer_posted_events (answerer, poster_id, answer, answer_hash) VALUES ($1, $2, $3, $4)".to_string()
     }
+
+    fn get_select_type(&self) -> Option<SelectDataType> {
+        None
+    }
 }
 
 impl SQLRequest for PosterWinnerPostedEvent {
@@ -145,6 +175,10 @@ impl SQLRequest for PosterWinnerPostedEvent {
 
     fn get_query(&self) -> String {
         "INSERT INTO poster_winner_posted_events (poster_id, winner) VALUES ($1, $2)".to_string()
+    }
+
+    fn get_select_type(&self) -> Option<SelectDataType> {
+        None
     }
 }
 
@@ -160,6 +194,10 @@ impl SQLRequest for PublisherNotResponded {
     fn get_query(&self) -> String {
         "INSERT INTO publisher_not_responded_events (poster_id, publisher_id) VALUES ($1, $2)"
             .to_string()
+    }
+
+    fn get_select_type(&self) -> Option<SelectDataType> {
+        None
     }
 }
 
@@ -179,6 +217,10 @@ impl SQLRequest for VoteForWinnerPosted {
     fn get_query(&self) -> String {
         "INSERT INTO vote_for_winner_posted_events (poster_id, voter, winner) VALUES ($1, $2, $3)"
             .to_string()
+    }
+
+    fn get_select_type(&self) -> Option<SelectDataType> {
+        None
     }
 }
 
@@ -303,5 +345,11 @@ where
                 pg_result: Some(res),
             });
         }
+    }
+}
+pub type DbCommand = Box<dyn FnOnce(PgPool) -> BoxFuture<'static, ()> + Send>;
+pub async fn run_db_requests(mut db_request_chan: Receiver<DbCommand>, pool: &PgPool) {
+    while let Some(req) = db_request_chan.recv().await {
+        req(pool.clone()).await;
     }
 }
