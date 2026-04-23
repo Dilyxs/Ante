@@ -36,14 +36,12 @@ pub async fn read_program_logs(
                     let req: DbCommand = Box::new(move |pool: PgPool| {
                         Box::pin(async move {
                             //the request type should awalys be insert, throw other cases!
-                            match sql_req.get_request_type() {
-                                SQLRequestType::Insert => {
-                                    run_request::<()>(&pool, &sql_req).await;
-                                }
-                                _ => {}
+                            if let SQLRequestType::Insert = sql_req.get_request_type() {
+                                run_request::<()>(&pool, &sql_req).await;
                             }
                         })
                     });
+                    sql_chan_sender.send(req).await;
                 };
             }
         }

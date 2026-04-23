@@ -14,16 +14,11 @@ use tokio::sync::watch::{
 use tokio::task::JoinHandle;
 
 use crate::{
-    db_data::postgres_runner::SQLRequest,
-    decryption::logs_reader::read_program_logs,
-    listener::anchor_listener::{ActionType, listen_to_program},
+    db_data::postgres_runner::{DbCommand, run_db_requests},
+    listener::socket_listener::{BlockchainEvent, IDManager, WebsocketMessageCommnand, ws_handler},
 };
 use crate::{
-    db_data::postgres_runner::{DbCommand, run_db_requests},
-    listener::socket_listener::{
-        BlockchainEvent, IDManager, WebSocketManager, WebSocketManagerCommandType,
-        WebsocketMessageCommnand, ws_handler,
-    },
+    decryption::logs_reader::read_program_logs, listener::anchor_listener::listen_to_program,
 };
 
 #[derive(Clone, FromRef, Debug)]

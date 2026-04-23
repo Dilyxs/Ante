@@ -37,16 +37,14 @@ pub fn decode_solana_logs(input: Vec<String>) -> Vec<Option<LogInfo>> {
             continue;
         }
 
-        let (disc_slice, payload) = bytes.split_at(8);
+        let (disc_slice, mut payload) = bytes.split_at(8);
         let disc: [u8; 8] = match disc_slice.try_into() {
             Ok(value) => value,
             Err(_) => continue,
         };
 
-        let mut payload_slice = &payload[..];
-
         if disc == PosterCreated::DISCRIMINATOR {
-            if let Ok(content) = PosterCreated::deserialize(&mut payload_slice) {
+            if let Ok(content) = PosterCreated::deserialize(&mut payload) {
                 decoded_logs.push(Some(LogInfo {
                     websocket_command_message: Some(WebsocketMessageCommnand {
                         message_type: None,
@@ -59,14 +57,14 @@ pub fn decode_solana_logs(input: Vec<String>) -> Vec<Option<LogInfo>> {
                 }));
             }
         } else if disc == PosterAnswered::DISCRIMINATOR {
-            if let Ok(content) = PosterAnswered::deserialize(&mut payload_slice) {
+            if let Ok(content) = PosterAnswered::deserialize(&mut payload) {
                 decoded_logs.push(Some(LogInfo {
                     websocket_command_message: None,
                     sql_command: Box::new(content),
                 }));
             }
         } else if disc == PosterPublishAnswered::DISCRIMINATOR {
-            if let Ok(content) = PosterPublishAnswered::deserialize(&mut payload_slice) {
+            if let Ok(content) = PosterPublishAnswered::deserialize(&mut payload) {
                 let response = RecentAnswer::new(
                     true,
                     true,
@@ -87,7 +85,7 @@ pub fn decode_solana_logs(input: Vec<String>) -> Vec<Option<LogInfo>> {
                 }));
             }
         } else if disc == AnswererDecryptedAnswerPosted::DISCRIMINATOR {
-            if let Ok(content) = AnswererDecryptedAnswerPosted::deserialize(&mut payload_slice) {
+            if let Ok(content) = AnswererDecryptedAnswerPosted::deserialize(&mut payload) {
                 let response = RecentAnswer::new(
                     true,
                     false,
@@ -108,7 +106,7 @@ pub fn decode_solana_logs(input: Vec<String>) -> Vec<Option<LogInfo>> {
                 }));
             }
         } else if disc == PosterWinnerPostedEvent::DISCRIMINATOR {
-            if let Ok(content) = PosterWinnerPostedEvent::deserialize(&mut payload_slice) {
+            if let Ok(content) = PosterWinnerPostedEvent::deserialize(&mut payload) {
                 decoded_logs.push(Some(LogInfo {
                     websocket_command_message: Some(WebsocketMessageCommnand {
                         message_type: None,
@@ -121,14 +119,14 @@ pub fn decode_solana_logs(input: Vec<String>) -> Vec<Option<LogInfo>> {
                 }));
             }
         } else if disc == PublisherNotResponded::DISCRIMINATOR {
-            if let Ok(content) = PublisherNotResponded::deserialize(&mut payload_slice) {
+            if let Ok(content) = PublisherNotResponded::deserialize(&mut payload) {
                 decoded_logs.push(Some(LogInfo {
                     websocket_command_message: None,
                     sql_command: Box::new(content),
                 }));
             }
         } else if disc == VoteForWinnerPosted::DISCRIMINATOR
-            && let Ok(content) = VoteForWinnerPosted::deserialize(&mut payload_slice)
+            && let Ok(content) = VoteForWinnerPosted::deserialize(&mut payload)
         {
             decoded_logs.push(Some(LogInfo {
                 websocket_command_message: Some(WebsocketMessageCommnand {

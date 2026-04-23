@@ -307,10 +307,10 @@ where
                 req = req.bind(arg);
             }
             let rows: Vec<T> = req.fetch_all(pool).await?;
-            return Ok(SQLResult {
+            Ok(SQLResult {
                 items: Some(rows),
                 pg_result: None,
-            });
+            })
         }
         SQLRequestType::Insert => {
             let mut req = sqlx::query(&query);
@@ -318,10 +318,10 @@ where
                 req = req.bind(arg);
             }
             let res = req.execute(pool).await?;
-            return Ok(SQLResult {
+            Ok(SQLResult {
                 items: None,
                 pg_result: Some(res),
-            });
+            })
         }
         SQLRequestType::Update => {
             let mut req = sqlx::query(&query);
@@ -329,10 +329,10 @@ where
                 req = req.bind(arg);
             }
             let res = req.execute(pool).await?;
-            return Ok(SQLResult {
+            Ok(SQLResult {
                 items: None,
                 pg_result: Some(res),
-            });
+            })
         }
         SQLRequestType::Delete => {
             let mut req = sqlx::query(&query);
@@ -340,10 +340,10 @@ where
                 req = req.bind(arg);
             }
             let res = req.execute(pool).await?;
-            return Ok(SQLResult {
+            Ok(SQLResult {
                 items: None,
                 pg_result: Some(res),
-            });
+            })
         }
     }
 }
