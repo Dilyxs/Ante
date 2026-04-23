@@ -30,7 +30,7 @@ pub trait SelectResult {
     fn get_content_len(&self) -> i32;
 }
 
-pub trait SQLRequest {
+pub trait SQLRequest: Send + Sync {
     fn get_request_type(&self) -> SQLRequestType;
     fn get_position_arg(&self) -> Vec<String>;
     fn get_query(&self) -> String;
@@ -280,7 +280,7 @@ impl std::error::Error for SQLError {}
 
 pub async fn run_request<T>(
     pool: &PgPool,
-    request: &dyn SQLRequest,
+    request: &Box<dyn SQLRequest>,
 ) -> Result<SQLResult<T>, sqlx::Error>
 where
     T: std::marker::Send + Unpin + for<'a> FromRow<'a, PgRow>,
