@@ -58,7 +58,7 @@ pub struct PosterCreatedEventRow {
     pub potential_answer: String,
 }
 
-#[derive(Debug, Clone, FromRow)]
+#[derive(Debug, Clone, FromRow, Serialize, Deserialize)]
 pub struct PosterAnsweredEventRow {
     pub answerer: String,
     pub answer_time: String,
@@ -66,7 +66,7 @@ pub struct PosterAnsweredEventRow {
     pub encrypted_answer: String,
 }
 
-#[derive(Debug, Clone, FromRow)]
+#[derive(Debug, Clone, FromRow, Serialize, Deserialize)]
 pub struct PosterPublishAnsweredEventRow {
     pub publisher: String,
     pub poster_id: String,
@@ -74,7 +74,7 @@ pub struct PosterPublishAnsweredEventRow {
     pub answer_hash: String,
 }
 
-#[derive(Debug, Clone, FromRow)]
+#[derive(Debug, Clone, FromRow, Serialize, Deserialize)]
 pub struct AnswererDecryptedAnswerPostedEventRow {
     pub answerer: String,
     pub poster_id: String,
@@ -82,19 +82,19 @@ pub struct AnswererDecryptedAnswerPostedEventRow {
     pub answer_hash: String,
 }
 
-#[derive(Debug, Clone, FromRow)]
+#[derive(Debug, Clone, FromRow, Serialize, Deserialize)]
 pub struct PosterWinnerPostedEventRow {
     pub poster_id: String,
     pub winner: String,
 }
 
-#[derive(Debug, Clone, FromRow)]
+#[derive(Debug, Clone, FromRow, Serialize, Deserialize)]
 pub struct PublisherNotRespondedEventRow {
     pub poster_id: String,
     pub publisher_id: String,
 }
 
-#[derive(Debug, Clone, FromRow)]
+#[derive(Debug, Clone, FromRow, Serialize, Deserialize)]
 pub struct VoteForWinnerPostedEventRow {
     pub poster_id: String,
     pub voter: String,

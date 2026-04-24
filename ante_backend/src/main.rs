@@ -15,7 +15,9 @@ use tokio::task::JoinHandle;
 
 use crate::{
     db_data::postgres_runner::{DbCommand, run_db_requests},
-    handlers::poster_getter::get_poster_data,
+    handlers::poster_getter::{
+        get_all_answered_post_data, get_poster_answered_data, get_poster_data,
+    },
     listener::socket_listener::{BlockchainEvent, IDManager, WebsocketMessageCommnand, ws_handler},
 };
 use crate::{
@@ -27,6 +29,7 @@ pub struct AppState {
     pub id_manager: Arc<Mutex<IDManager>>,
     pub cancel_chan: WatchReceiver<bool>,
     pub websocket_manager_chan: Sender<WebsocketMessageCommnand>,
+    pub db_request_sender: Sender<DbCommand>,
 }
 mod db_data;
 mod decryption;
@@ -64,8 +67,14 @@ async fn main() {
     ) = tokio::sync::mpsc::channel(10);
 
     let websocket_sender_clone = websocket_manager_chan_sender.clone();
+    let db_request_sender_for_logs = db_request_sender.clone();
     tokio::spawn(async move {
-        read_program_logs(tx_event_receiver, websocket_sender_clone, db_request_sender).await;
+        read_program_logs(
+            tx_event_receiver,
+            websocket_sender_clone,
+            db_request_sender_for_logs,
+        )
+        .await;
     });
     let rx_clone = cancellation_listener.clone();
     tokio::spawn(async move {
@@ -79,11 +88,14 @@ async fn main() {
         id_manager: Arc::new(Mutex::new(id_manager)),
         cancel_chan: cancellation_listener.clone(),
         websocket_manager_chan: websocket_manager_chan_sender.clone(),
+        db_request_sender: db_request_sender.clone(),
     };
     let app: Router = Router::new()
         .route("/", get(|| async { "server is up" }))
         .route("/websocket", any(ws_handler))
         .route("/get_poster", post(get_poster_data))
+        .route("/get_poster_answered", post(get_poster_answered_data))
+        .route("/get_all_answered_post", post(get_all_answered_post_data))
         .with_state(app_state);
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3004").await.unwrap();
     axum::serve(listener, app).await.unwrap();
