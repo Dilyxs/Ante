@@ -1,3 +1,6 @@
+use std::i32;
+
+use serde::{Deserialize, Serialize};
 use tokio::sync::mpsc::{Receiver, Sender};
 
 use challenge_protocol::{
@@ -19,6 +22,7 @@ pub enum SelectDataType {
     PosterInfo,
 }
 
+#[derive(Clone, Debug)]
 pub enum SQLRequestType {
     Insert,
     Update,
@@ -31,7 +35,7 @@ pub trait SelectResult {
 }
 
 pub trait SQLRequest: Send + Sync {
-    fn get_request_type(&self) -> SQLRequestType;
+    fn get_request_type(&self) -> &SQLRequestType;
     fn get_position_arg(&self) -> Vec<String>;
     fn get_query(&self) -> String;
     fn get_select_type(&self) -> Option<SelectDataType>;
@@ -39,6 +43,62 @@ pub trait SQLRequest: Send + Sync {
 pub struct RequestSQL<T> {
     chan: Sender<Result<SQLResult<T>, sqlx::Error>>,
     req: Box<dyn SQLRequest>,
+}
+
+#[derive(Debug, Clone, FromRow, Serialize, Deserialize)]
+pub struct PosterCreatedEventRow {
+    pub publisher: String,
+    pub bounty_id: String,
+    pub bounty_type: String,
+    pub bounty_topic: String,
+    pub bounty_minimum_gain: String,
+    pub submission_cost: String,
+    pub deadline: String,
+    pub current_time: String,
+    pub potential_answer: String,
+}
+
+#[derive(Debug, Clone, FromRow)]
+pub struct PosterAnsweredEventRow {
+    pub answerer: String,
+    pub answer_time: String,
+    pub poster_id: String,
+    pub encrypted_answer: String,
+}
+
+#[derive(Debug, Clone, FromRow)]
+pub struct PosterPublishAnsweredEventRow {
+    pub publisher: String,
+    pub poster_id: String,
+    pub answer: String,
+    pub answer_hash: String,
+}
+
+#[derive(Debug, Clone, FromRow)]
+pub struct AnswererDecryptedAnswerPostedEventRow {
+    pub answerer: String,
+    pub poster_id: String,
+    pub answer: String,
+    pub answer_hash: String,
+}
+
+#[derive(Debug, Clone, FromRow)]
+pub struct PosterWinnerPostedEventRow {
+    pub poster_id: String,
+    pub winner: String,
+}
+
+#[derive(Debug, Clone, FromRow)]
+pub struct PublisherNotRespondedEventRow {
+    pub poster_id: String,
+    pub publisher_id: String,
+}
+
+#[derive(Debug, Clone, FromRow)]
+pub struct VoteForWinnerPostedEventRow {
+    pub poster_id: String,
+    pub voter: String,
+    pub winner: String,
 }
 
 fn bounty_type_to_string(bounty_type: &BountyType) -> String {
@@ -69,8 +129,8 @@ fn option_answer_to_string(answer: &Option<[u8; 33]>) -> String {
 }
 
 impl SQLRequest for PosterCreated {
-    fn get_request_type(&self) -> SQLRequestType {
-        SQLRequestType::Insert
+    fn get_request_type(&self) -> &SQLRequestType {
+        &SQLRequestType::Insert
     }
 
     fn get_position_arg(&self) -> Vec<String> {
@@ -96,8 +156,8 @@ impl SQLRequest for PosterCreated {
 }
 
 impl SQLRequest for PosterAnswered {
-    fn get_request_type(&self) -> SQLRequestType {
-        SQLRequestType::Insert
+    fn get_request_type(&self) -> &SQLRequestType {
+        &SQLRequestType::Insert
     }
 
     fn get_position_arg(&self) -> Vec<String> {
@@ -119,8 +179,8 @@ impl SQLRequest for PosterAnswered {
 }
 
 impl SQLRequest for PosterPublishAnswered {
-    fn get_request_type(&self) -> SQLRequestType {
-        SQLRequestType::Insert
+    fn get_request_type(&self) -> &SQLRequestType {
+        &SQLRequestType::Insert
     }
 
     fn get_position_arg(&self) -> Vec<String> {
@@ -142,8 +202,8 @@ impl SQLRequest for PosterPublishAnswered {
 }
 
 impl SQLRequest for AnswererDecryptedAnswerPosted {
-    fn get_request_type(&self) -> SQLRequestType {
-        SQLRequestType::Insert
+    fn get_request_type(&self) -> &SQLRequestType {
+        &SQLRequestType::Insert
     }
 
     fn get_position_arg(&self) -> Vec<String> {
@@ -165,8 +225,8 @@ impl SQLRequest for AnswererDecryptedAnswerPosted {
 }
 
 impl SQLRequest for PosterWinnerPostedEvent {
-    fn get_request_type(&self) -> SQLRequestType {
-        SQLRequestType::Insert
+    fn get_request_type(&self) -> &SQLRequestType {
+        &SQLRequestType::Insert
     }
 
     fn get_position_arg(&self) -> Vec<String> {
@@ -183,8 +243,8 @@ impl SQLRequest for PosterWinnerPostedEvent {
 }
 
 impl SQLRequest for PublisherNotResponded {
-    fn get_request_type(&self) -> SQLRequestType {
-        SQLRequestType::Insert
+    fn get_request_type(&self) -> &SQLRequestType {
+        &SQLRequestType::Insert
     }
 
     fn get_position_arg(&self) -> Vec<String> {
@@ -202,8 +262,8 @@ impl SQLRequest for PublisherNotResponded {
 }
 
 impl SQLRequest for VoteForWinnerPosted {
-    fn get_request_type(&self) -> SQLRequestType {
-        SQLRequestType::Insert
+    fn get_request_type(&self) -> &SQLRequestType {
+        &SQLRequestType::Insert
     }
 
     fn get_position_arg(&self) -> Vec<String> {

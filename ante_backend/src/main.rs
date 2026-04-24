@@ -1,7 +1,7 @@
 use axum::{
     Router,
     extract::FromRef,
-    routing::{any, get},
+    routing::{any, get, post},
 };
 use futures_util::lock::Mutex;
 use std::env::var;
@@ -15,6 +15,7 @@ use tokio::task::JoinHandle;
 
 use crate::{
     db_data::postgres_runner::{DbCommand, run_db_requests},
+    handlers::poster_getter::get_poster_data,
     listener::socket_listener::{BlockchainEvent, IDManager, WebsocketMessageCommnand, ws_handler},
 };
 use crate::{
@@ -29,6 +30,7 @@ pub struct AppState {
 }
 mod db_data;
 mod decryption;
+mod handlers;
 mod listener;
 #[tokio::main]
 async fn main() {
@@ -81,6 +83,7 @@ async fn main() {
     let app: Router = Router::new()
         .route("/", get(|| async { "server is up" }))
         .route("/websocket", any(ws_handler))
+        .route("/get_poster", post(get_poster_data))
         .with_state(app_state);
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3004").await.unwrap();
     axum::serve(listener, app).await.unwrap();
