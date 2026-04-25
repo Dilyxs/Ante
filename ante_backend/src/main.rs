@@ -16,7 +16,12 @@ use tokio::task::JoinHandle;
 use crate::{
     db_data::postgres_runner::{DbCommand, run_db_requests},
     handlers::poster_getter::{
-        get_all_answered_post_data, get_poster_answered_data, get_poster_data,
+        get_all_answered_post_data, get_all_answerer_decrypted_answer_posted_data,
+        get_all_poster_publish_answered_data, get_all_poster_winner_posted_data,
+        get_all_publisher_not_responded_data, get_all_vote_for_winner_posted_data,
+        get_answerer_decrypted_answer_posted_data, get_poster_answered_data,
+        get_poster_data, get_poster_publish_answered_data, get_poster_winner_posted_data,
+        get_publisher_not_responded_data, get_vote_for_winner_posted_data,
     },
     listener::socket_listener::{BlockchainEvent, IDManager, WebsocketMessageCommnand, ws_handler},
 };
@@ -96,6 +101,46 @@ async fn main() {
         .route("/get_poster", post(get_poster_data))
         .route("/get_poster_answered", post(get_poster_answered_data))
         .route("/get_all_answered_post", post(get_all_answered_post_data))
+        .route(
+            "/get_poster_publish_answered",
+            post(get_poster_publish_answered_data),
+        )
+        .route(
+            "/get_all_poster_publish_answered",
+            post(get_all_poster_publish_answered_data),
+        )
+        .route(
+            "/get_answerer_decrypted_answer_posted",
+            post(get_answerer_decrypted_answer_posted_data),
+        )
+        .route(
+            "/get_all_answerer_decrypted_answer_posted",
+            post(get_all_answerer_decrypted_answer_posted_data),
+        )
+        .route(
+            "/get_poster_winner_posted",
+            post(get_poster_winner_posted_data),
+        )
+        .route(
+            "/get_all_poster_winner_posted",
+            post(get_all_poster_winner_posted_data),
+        )
+        .route(
+            "/get_publisher_not_responded",
+            post(get_publisher_not_responded_data),
+        )
+        .route(
+            "/get_all_publisher_not_responded",
+            post(get_all_publisher_not_responded_data),
+        )
+        .route(
+            "/get_vote_for_winner_posted",
+            post(get_vote_for_winner_posted_data),
+        )
+        .route(
+            "/get_all_vote_for_winner_posted",
+            post(get_all_vote_for_winner_posted_data),
+        )
         .with_state(app_state);
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3004").await.unwrap();
     axum::serve(listener, app).await.unwrap();
